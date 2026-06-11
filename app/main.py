@@ -11,8 +11,10 @@ Déploiement Railway :
 
 from pathlib import Path
 
+import traceback
+
 from fastapi import FastAPI, Request
-from fastapi.responses import RedirectResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
@@ -67,8 +69,34 @@ async def root():
     return RedirectResponse(url="/books")
 
 
-# ─── Health-check (utile pour Railway et les probes de monitoring) ────────────
+# ─── Health-check ────────────────────────────────────────────────────────────
 
 @app.get("/health", include_in_schema=False)
 async def health():
     return {"status": "ok"}
+
+
+# ─── Handler global d'erreurs 500 ────────────────────────────────────────────
+# Capture TOUTES les exceptions non gérées et les affiche dans l'interface
+# plutôt que de renvoyer un "Internal Server Error" opaque.
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    error_text = traceback.format_exc()
+    # Tente d'afficher via le template si disponible
+    try:
+        return app.state.templates.TemplateResponse(
+            "error.html",
+            {
+                "request": request,
+                "error": str(exc),
+                "error_detail": error_text,
+            },
+            status_code=500,
+        )
+    except Exception:
+        # Fallback texte brut si même le template plante
+        return HTMLResponse(
+            content=f"<pre><b>{exc}</b>\n\n{error_text}</pre>",
+            status_code=500,
+        )
