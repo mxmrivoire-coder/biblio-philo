@@ -2,7 +2,7 @@
 ai_books.py — Service de génération de fiche de lecture (Mode 1).
 
 API : Perplexity (compatible OpenAI SDK)
-Modèle : llama-3.1-sonar-large-128k-online
+Modèle : sonar-pro
 Clé   : variable d'environnement AI_API_KEY
 """
 
@@ -77,7 +77,7 @@ def generate_book_summary(book: "Book") -> dict:
     """
     client = _get_client()
     response = client.chat.completions.create(
-        model="llama-3.1-sonar-large-128k-online",
+        model="sonar-pro",
         messages=[
             {
                 "role": "system",

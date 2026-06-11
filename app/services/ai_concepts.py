@@ -2,7 +2,7 @@
 ai_concepts.py — Service de génération de cartes conceptuelles (Mode 2).
 
 API : Perplexity (compatible OpenAI SDK)
-Modèle : llama-3.1-sonar-large-128k-online
+Modèle : sonar-pro
 Clé   : variable d'environnement AI_API_KEY
 """
 
@@ -57,7 +57,7 @@ def generate_concept_map(theme: str, authors: list[str]) -> dict:
     """
     client = _get_client()
     response = client.chat.completions.create(
-        model="llama-3.1-sonar-large-128k-online",
+        model="sonar-pro",
         messages=[
             {
                 "role": "system",

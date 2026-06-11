@@ -2,7 +2,7 @@
 ai_problems.py — Service de génération de problématiques et plans (Mode 3).
 
 API : Perplexity (compatible OpenAI SDK)
-Modèle : llama-3.1-sonar-large-128k-online
+Modèle : sonar-pro
 Clé   : variable d'environnement AI_API_KEY
 """
 
@@ -80,7 +80,7 @@ def generate_problems_and_plans(theme: str, authors: list[str], orientation: str
     """
     client = _get_client()
     response = client.chat.completions.create(
-        model="llama-3.1-sonar-large-128k-online",
+        model="sonar-pro",
         messages=[
             {
                 "role": "system",
