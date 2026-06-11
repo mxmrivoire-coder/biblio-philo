@@ -139,6 +139,44 @@ async def generate_fiche(
     return RedirectResponse(url=f"/books/{book_id}?flash=fiche_generated", status_code=303)
 
 
+# ─── Formulaire d'édition ───────────────────────────────────────────────────
+
+@router.get("/{book_id}/edit", response_class=HTMLResponse)
+async def edit_book_form(request: Request, book_id: int, db: Session = Depends(get_db)):
+    book = db.get(Book, book_id)
+    if not book:
+        raise HTTPException(status_code=404, detail="Livre introuvable")
+    return request.app.state.templates.TemplateResponse(
+        "books/edit.html",
+        {
+            "request": request,
+            "book": book,
+            "book_types": BOOK_TYPES,
+            "book_statuses": BOOK_STATUSES,
+        },
+    )
+
+
+@router.post("/{book_id}/edit", response_class=RedirectResponse)
+async def update_book(
+    book_id: int,
+    title: str = Form(...),
+    author: str = Form(...),
+    type: str = Form(...),
+    status: str = Form(...),
+    db: Session = Depends(get_db),
+):
+    book = db.get(Book, book_id)
+    if not book:
+        raise HTTPException(status_code=404, detail="Livre introuvable")
+    book.title = title.strip()
+    book.author = author.strip()
+    book.type = type
+    book.status = status
+    db.commit()
+    return RedirectResponse(url=f"/books/{book_id}?flash=book_updated", status_code=303)
+
+
 # ─── Suppression ──────────────────────────────────────────────────────────────
 
 @router.post("/{book_id}/delete", response_class=RedirectResponse)
