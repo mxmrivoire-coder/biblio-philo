@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Cartes conceptuelles — Bibliothécaire philo{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-between mb-6">
+  <h1 class="text-2xl font-bold text-stone-900">Cartes conceptuelles</h1>
+  <a href="/concept-maps/new"
+     class="inline-flex items-center gap-2 bg-amber-600 hover:bg-amber-700 text-white text-sm font-medium px-4 py-2 rounded-lg shadow transition-colors">
+    + Nouvelle carte
+  </a>
+</div>
+
+{% if maps %}
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+  {% for m in maps %}
+  <a href="/concept-maps/{{ m.id }}"
+     class="block bg-white rounded-xl shadow-sm border border-stone-200 p-5 hover:shadow-md hover:border-amber-300 transition-all">
+    <h2 class="font-semibold text-stone-900 mb-1">{{ m.title }}</h2>
+    <p class="text-xs text-stone-500 mb-3">Thème : {{ m.theme }}</p>
+    {% if m.authors_list %}
+    <div class="flex flex-wrap gap-1">
+      {% for author in m.authors_list %}
+      <span class="text-xs bg-stone-100 text-stone-600 px-2 py-0.5 rounded-full">{{ author }}</span>
+      {% endfor %}
+    </div>
+    {% endif %}
+    <p class="text-xs text-stone-400 mt-3">
+      {{ m.nodes_dict.concepts | length }} concept{% if m.nodes_dict.concepts | length != 1 %}s{% endif %} ·
+      {{ m.edges_list | length }} lien{% if m.edges_list | length != 1 %}s{% endif %}
+    </p>
+  </a>
+  {% endfor %}
+</div>
+
+{% else %}
+<div class="text-center py-20 text-stone-400">
+  <p class="text-5xl mb-4">🗺️</p>
+  <p class="text-lg font-medium mb-2">Aucune carte conceptuelle pour l'instant.</p>
+  <p class="text-sm mb-6">Créez votre première carte en croisant auteurs et concepts.</p>
+  <a href="/concept-maps/new"
+     class="bg-amber-600 hover:bg-amber-700 text-white px-5 py-2.5 rounded-lg text-sm font-medium transition-colors">
+    + Nouvelle carte
+  </a>
+</div>
+{% endif %}
+{% endblock %}

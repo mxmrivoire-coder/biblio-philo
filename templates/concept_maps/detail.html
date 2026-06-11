@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block title %}{{ map.title }} — Bibliothécaire philo{% endblock %}
+
+{% block content %}
+
+<!-- En-tête -->
+<div class="flex items-start justify-between mb-6 gap-4">
+  <div>
+    <a href="/concept-maps" class="text-stone-400 hover:text-stone-600 text-sm">← Cartes</a>
+    <h1 class="text-2xl font-bold text-stone-900 mt-1">{{ map.title }}</h1>
+    <p class="text-stone-500 text-sm mt-0.5">Thème : <strong>{{ map.theme }}</strong></p>
+    {% if map.authors_list %}
+    <div class="flex flex-wrap gap-1 mt-2">
+      {% for author in map.authors_list %}
+      <span class="text-xs bg-stone-100 text-stone-600 px-2 py-0.5 rounded-full">{{ author }}</span>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+
+  <form action="/concept-maps/{{ map.id }}/delete" method="post"
+        onsubmit="return confirm('Supprimer cette carte ?')">
+    <button type="submit"
+            class="text-xs text-red-400 hover:text-red-600 border border-red-200 hover:border-red-400 px-3 py-1.5 rounded-lg transition-colors">
+      Supprimer
+    </button>
+  </form>
+</div>
+
+<!-- Synthèse 10 lignes -->
+{% if map.summary_10_lines %}
+<section class="bg-amber-50 border border-amber-200 rounded-xl p-5 mb-6">
+  <h2 class="text-sm font-semibold uppercase tracking-wider text-amber-700 mb-2">Synthèse</h2>
+  <p class="text-sm text-stone-700 whitespace-pre-wrap leading-relaxed">{{ map.summary_10_lines }}</p>
+</section>
+{% endif %}
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+  <!-- ── Nœuds ──────────────────────────────────────────────────── -->
+  <section class="bg-white rounded-xl shadow-sm border border-stone-200 p-5">
+    <h2 class="text-base font-semibold text-stone-800 mb-4">Nœuds</h2>
+
+    {% set nodes = map.nodes_dict %}
+
+    {% if nodes.authors %}
+    <div class="mb-4">
+      <h3 class="text-xs font-semibold uppercase tracking-wider text-purple-500 mb-2">Auteurs</h3>
+      <ul class="space-y-1">
+        {% for n in nodes.authors %}
+        <li class="text-sm flex items-start gap-2">
+          <span class="mt-1 w-2 h-2 rounded-full bg-purple-400 shrink-0"></span>{{ n }}
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+
+    {% if nodes.concepts %}
+    <div class="mb-4">
+      <h3 class="text-xs font-semibold uppercase tracking-wider text-blue-500 mb-2">Concepts</h3>
+      <ul class="space-y-1">
+        {% for n in nodes.concepts %}
+        <li class="text-sm flex items-start gap-2">
+          <span class="mt-1 w-2 h-2 rounded-full bg-blue-400 shrink-0"></span>{{ n }}
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+
+    {% if nodes.examples %}
+    <div>
+      <h3 class="text-xs font-semibold uppercase tracking-wider text-green-500 mb-2">Exemples</h3>
+      <ul class="space-y-1">
+        {% for n in nodes.examples %}
+        <li class="text-sm flex items-start gap-2">
+          <span class="mt-1 w-2 h-2 rounded-full bg-green-400 shrink-0"></span>{{ n }}
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+  </section>
+
+  <!-- ── Liens (edges) ──────────────────────────────────────────── -->
+  <section class="bg-white rounded-xl shadow-sm border border-stone-200 p-5">
+    <h2 class="text-base font-semibold text-stone-800 mb-4">Liens entre nœuds</h2>
+
+    {% set edges = map.edges_list %}
+    {% if edges %}
+    <ul class="space-y-3">
+      {% for edge in edges %}
+      <li class="text-sm border-l-2 border-amber-300 pl-3">
+        <span class="font-medium text-stone-800">{{ edge.from }}</span>
+        <span class="text-stone-400 mx-1">→</span>
+        <span class="font-medium text-stone-800">{{ edge.to }}</span>
+        {% if edge.description %}
+        <br><span class="text-stone-500 text-xs italic">{{ edge.description }}</span>
+        {% endif %}
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p class="text-stone-400 text-sm">Aucun lien défini.</p>
+    {% endif %}
+  </section>
+
+</div>
+{% endblock %}

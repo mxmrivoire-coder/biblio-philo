@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}Bibliothécaire philo{% endblock %}</title>
+
+  <!-- TailwindCSS via CDN — pas de build step nécessaire -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- HTMX pour les interactions dynamiques -->
+  <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+
+  <style>
+    /* Supprime le flash FOUC de Tailwind CDN */
+    [x-cloak] { display: none; }
+    /* Scrollbar discrète */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 3px; }
+  </style>
+</head>
+
+<body class="bg-stone-50 text-stone-800 min-h-screen flex flex-col font-sans">
+
+  <!-- ── Navigation principale ─────────────────────────────────────── -->
+  <nav class="bg-stone-900 text-stone-100 shadow-md">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+      <a href="/" class="text-lg font-semibold tracking-tight hover:text-amber-300 transition-colors">
+        📚 Bibliothécaire philo
+      </a>
+      <ul class="flex gap-6 text-sm font-medium">
+        <li>
+          <a href="/books"
+             class="hover:text-amber-300 transition-colors {% if request.url.path.startswith('/books') %}text-amber-300 border-b border-amber-300 pb-0.5{% endif %}">
+            Livres
+          </a>
+        </li>
+        <li>
+          <a href="/concept-maps"
+             class="hover:text-amber-300 transition-colors {% if request.url.path.startswith('/concept-maps') %}text-amber-300 border-b border-amber-300 pb-0.5{% endif %}">
+            Cartes conceptuelles
+          </a>
+        </li>
+        <li>
+          <a href="/problems"
+             class="hover:text-amber-300 transition-colors {% if request.url.path.startswith('/problems') %}text-amber-300 border-b border-amber-300 pb-0.5{% endif %}">
+            Problématiques
+          </a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- ── Message flash (paramètre URL ?flash=...) ──────────────────── -->
+  {% set flash = request.query_params.get('flash') %}
+  {% if flash %}
+  <div id="flash-msg"
+       class="bg-amber-100 border-l-4 border-amber-500 text-amber-800 px-4 py-3 text-sm max-w-6xl mx-auto w-full mt-4 rounded-r-md shadow-sm flex justify-between items-center"
+       role="alert">
+    <span>
+      {% if flash == 'notes_saved' %}Notes enregistrées avec succès.
+      {% elif flash == 'fiche_generated' %}Fiche de lecture générée.
+      {% elif flash == 'book_deleted' %}Livre supprimé.
+      {% elif flash == 'map_deleted' %}Carte supprimée.
+      {% elif flash == 'ps_deleted' %}Ensemble supprimé.
+      {% else %}Opération effectuée.{% endif %}
+    </span>
+    <button onclick="document.getElementById('flash-msg').remove()"
+            class="ml-4 text-amber-600 hover:text-amber-900 font-bold text-lg leading-none">×</button>
+  </div>
+  {% endif %}
+
+  <!-- ── Contenu principal ─────────────────────────────────────────── -->
+  <main class="flex-1 max-w-6xl mx-auto w-full px-4 py-8">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- ── Pied de page ──────────────────────────────────────────────── -->
+  <footer class="bg-stone-900 text-stone-400 text-xs text-center py-3 mt-auto">
+    Bibliothécaire philo/politique — usage personnel
+  </footer>
+
+</body>
+</html>

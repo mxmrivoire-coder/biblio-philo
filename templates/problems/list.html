@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Problématiques — Bibliothécaire philo{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-between mb-6">
+  <h1 class="text-2xl font-bold text-stone-900">Problématiques et plans</h1>
+  <a href="/problems/new"
+     class="inline-flex items-center gap-2 bg-amber-600 hover:bg-amber-700 text-white text-sm font-medium px-4 py-2 rounded-lg shadow transition-colors">
+    + Nouveau
+  </a>
+</div>
+
+{% if problem_sets %}
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+  {% for ps in problem_sets %}
+  <a href="/problems/{{ ps.id }}"
+     class="block bg-white rounded-xl shadow-sm border border-stone-200 p-5 hover:shadow-md hover:border-amber-300 transition-all">
+    <div class="flex items-start justify-between gap-2">
+      <h2 class="font-semibold text-stone-900">{{ ps.title }}</h2>
+      <span class="shrink-0 text-xs px-2 py-0.5 rounded-full
+        {% if ps.orientation == 'thread' %}bg-sky-100 text-sky-700{% else %}bg-violet-100 text-violet-700{% endif %}">
+        {{ ps.orientation_label }}
+      </span>
+    </div>
+    <p class="text-xs text-stone-500 mt-1 mb-3">Thème : {{ ps.theme }}</p>
+    {% if ps.authors_list %}
+    <div class="flex flex-wrap gap-1">
+      {% for author in ps.authors_list %}
+      <span class="text-xs bg-stone-100 text-stone-600 px-2 py-0.5 rounded-full">{{ author }}</span>
+      {% endfor %}
+    </div>
+    {% endif %}
+    <p class="text-xs text-stone-400 mt-3">
+      {{ ps.problems_list | length }} problématique{% if ps.problems_list | length != 1 %}s{% endif %}
+    </p>
+  </a>
+  {% endfor %}
+</div>
+
+{% else %}
+<div class="text-center py-20 text-stone-400">
+  <p class="text-5xl mb-4">🧠</p>
+  <p class="text-lg font-medium mb-2">Aucun ensemble de problématiques.</p>
+  <p class="text-sm mb-6">Croisez auteurs et thème pour générer des problématiques et plans.</p>
+  <a href="/problems/new"
+     class="bg-amber-600 hover:bg-amber-700 text-white px-5 py-2.5 rounded-lg text-sm font-medium transition-colors">
+    + Nouveau
+  </a>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Livres — Bibliothécaire philo{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-between mb-6">
+  <h1 class="text-2xl font-bold text-stone-900">Ma bibliothèque</h1>
+  <a href="/books/new"
+     class="inline-flex items-center gap-2 bg-amber-600 hover:bg-amber-700 text-white text-sm font-medium px-4 py-2 rounded-lg shadow transition-colors">
+    + Ajouter un livre
+  </a>
+</div>
+
+{% if books %}
+<div class="overflow-x-auto rounded-xl shadow-sm border border-stone-200">
+  <table class="w-full text-sm bg-white">
+    <thead class="bg-stone-100 text-stone-600 text-left text-xs uppercase tracking-wider">
+      <tr>
+        <th class="px-4 py-3">Titre</th>
+        <th class="px-4 py-3">Auteur</th>
+        <th class="px-4 py-3">Type</th>
+        <th class="px-4 py-3">Statut</th>
+        <th class="px-4 py-3">Fiche IA</th>
+        <th class="px-4 py-3">Actions</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-stone-100">
+      {% for book in books %}
+      <tr class="hover:bg-stone-50 transition-colors">
+        <td class="px-4 py-3 font-medium">{{ book.title }}</td>
+        <td class="px-4 py-3 text-stone-600">{{ book.author }}</td>
+        <td class="px-4 py-3">
+          <span class="inline-block px-2 py-0.5 rounded-full text-xs font-medium
+            {% if book.type == 'roman' %}bg-blue-100 text-blue-700
+            {% elif book.type == 'essai_philo' %}bg-purple-100 text-purple-700
+            {% elif book.type == 'essai_politique' %}bg-red-100 text-red-700
+            {% else %}bg-green-100 text-green-700{% endif %}">
+            {{ book.type_label }}
+          </span>
+        </td>
+        <td class="px-4 py-3">
+          <span class="inline-block px-2 py-0.5 rounded-full text-xs font-medium
+            {% if book.status == 'terminé' %}bg-emerald-100 text-emerald-700
+            {% else %}bg-orange-100 text-orange-700{% endif %}">
+            {{ book.status_label }}
+          </span>
+        </td>
+        <td class="px-4 py-3 text-center">
+          {% if book.has_ai_content %}
+            <span title="Fiche générée" class="text-emerald-500">✓</span>
+          {% else %}
+            <span title="Pas encore générée" class="text-stone-300">–</span>
+          {% endif %}
+        </td>
+        <td class="px-4 py-3">
+          <a href="/books/{{ book.id }}"
+             class="text-amber-600 hover:text-amber-800 font-medium mr-3">Ouvrir</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<p class="text-xs text-stone-400 mt-3">{{ books|length }} livre{% if books|length > 1 %}s{% endif %} enregistré{% if books|length > 1 %}s{% endif %}.</p>
+
+{% else %}
+<div class="text-center py-20 text-stone-400">
+  <p class="text-5xl mb-4">📖</p>
+  <p class="text-lg font-medium mb-2">Aucun livre pour l'instant.</p>
+  <p class="text-sm mb-6">Commencez par ajouter un livre à votre bibliothèque.</p>
+  <a href="/books/new"
+     class="bg-amber-600 hover:bg-amber-700 text-white px-5 py-2.5 rounded-lg text-sm font-medium transition-colors">
+    + Ajouter un livre
+  </a>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,26 @@
+# Environnement Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+env/
+*.egg-info/
+
+# Variables d'environnement (contient les clés API)
+.env
+
+# Base de données locale
+data/biblioth.db
+data/*.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# macOS
+.DS_Store
+
+# Railway
+.railway/
