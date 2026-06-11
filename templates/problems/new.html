@@ -8,6 +8,18 @@
     <h1 class="text-2xl font-bold text-stone-900">Nouvelle problématique</h1>
   </div>
 
+  {% if error %}
+  <div class="bg-red-50 border border-red-300 text-red-800 rounded-lg p-4 mb-5 text-sm">
+    <p class="font-semibold mb-1">{{ error }}</p>
+    {% if error_detail %}
+    <details class="mt-2">
+      <summary class="cursor-pointer text-xs text-red-500">Détail technique</summary>
+      <pre class="mt-2 text-xs overflow-auto whitespace-pre-wrap">{{ error_detail }}</pre>
+    </details>
+    {% endif %}
+  </div>
+  {% endif %}
+
   <form action="/problems" method="post"
         class="bg-white rounded-xl shadow-sm border border-stone-200 p-6 space-y-5">
 

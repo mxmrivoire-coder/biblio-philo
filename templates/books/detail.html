@@ -3,6 +3,18 @@
 
 {% block content %}
 
+{% if error %}
+<div class="bg-red-50 border border-red-300 text-red-800 rounded-lg p-4 mb-5 text-sm">
+  <p class="font-semibold mb-1">{{ error }}</p>
+  {% if error_detail %}
+  <details class="mt-2">
+    <summary class="cursor-pointer text-xs text-red-500">Détail technique</summary>
+    <pre class="mt-2 text-xs overflow-auto whitespace-pre-wrap">{{ error_detail }}</pre>
+  </details>
+  {% endif %}
+</div>
+{% endif %}
+
 <!-- En-tête du livre -->
 <div class="flex items-start justify-between mb-6 gap-4">
   <div>

@@ -11,6 +11,8 @@ Routes :
 
 import json
 
+import traceback
+
 from fastapi import APIRouter, Depends, Form, HTTPException, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy.orm import Session
@@ -73,7 +75,20 @@ async def create_concept_map(
     if extra_author.strip():
         all_authors.append(extra_author.strip())
 
-    result = generate_concept_map(theme=theme, authors=all_authors)
+    try:
+        result = generate_concept_map(theme=theme, authors=all_authors)
+    except Exception as e:
+        error_detail = traceback.format_exc()
+        return request.app.state.templates.TemplateResponse(
+            "concept_maps/new.html",
+            {
+                "request": request,
+                "predefined_authors": PREDEFINED_AUTHORS,
+                "error": f"Erreur lors de la génération IA : {e}",
+                "error_detail": error_detail,
+            },
+            status_code=500,
+        )
 
     concept_map = ConceptMap(
         title=title.strip(),

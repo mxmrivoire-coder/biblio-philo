@@ -12,6 +12,7 @@ Routes :
 """
 
 import json
+import traceback
 
 from fastapi import APIRouter, Depends, Form, HTTPException, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -127,7 +128,20 @@ async def generate_fiche(
     if not book:
         raise HTTPException(status_code=404, detail="Livre introuvable")
 
-    result = generate_book_summary(book)
+    try:
+        result = generate_book_summary(book)
+    except Exception as e:
+        error_detail = traceback.format_exc()
+        return request.app.state.templates.TemplateResponse(
+            "books/detail.html",
+            {
+                "request": request,
+                "book": book,
+                "error": f"Erreur lors de la génération IA : {e}",
+                "error_detail": error_detail,
+            },
+            status_code=500,
+        )
 
     book.ai_summary = result.get("summary")
     book.ai_concepts = result.get("concepts")
