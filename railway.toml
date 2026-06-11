@@ -3,3 +3,10 @@ nixpacks_python_version = "3.12"
 
 [deploy]
 startCommand = "uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+
+# ─── Volume persistant ────────────────────────────────────────────────────────
+# Pour activer la persistance de la DB SQLite sur Railway :
+# 1. Dans Railway → ton projet → "Add Volume"
+# 2. Mount Path : /data
+# 3. La variable DATABASE_URL sera automatiquement résolue vers /data/biblioth.db
+# ─────────────────────────────────────────────────────────────────────────────

@@ -1,13 +1,13 @@
 """
 ai_books.py — Service de génération de fiche de lecture (Mode 1).
 
-API : Perplexity (compatible OpenAI SDK)
-Modèle : sonar-pro
-Clé   : variable d'environnement AI_API_KEY
+API : Perplexity sonar-pro
+Clé : variable d'environnement AI_API_KEY
 """
 
 import json
 import os
+import re
 from typing import TYPE_CHECKING
 
 from openai import OpenAI
@@ -15,8 +15,6 @@ from openai import OpenAI
 if TYPE_CHECKING:
     from app.models import Book
 
-
-# ─── Client Perplexity (réutilisé à chaque appel) ────────────────────────────
 
 def _get_client() -> OpenAI:
     api_key = os.environ.get("AI_API_KEY")
@@ -31,7 +29,28 @@ def _get_client() -> OpenAI:
     )
 
 
-# ─── Construction du prompt ───────────────────────────────────────────────────
+def _extract_json(raw: str) -> dict:
+    """
+    Extrait un objet JSON depuis une réponse texte qui peut contenir :
+    - des balises markdown ```json ... ```
+    - du texte introductif avant le JSON
+    - des balises <think>...</think>
+    """
+    # Supprimer les blocs <think>
+    raw = re.sub(r"<think>.*?</think>", "", raw, flags=re.DOTALL).strip()
+
+    # Cas 1 : bloc ```json ... ```
+    match = re.search(r"```(?:json)?\s*(\{.*?\})\s*```", raw, re.DOTALL)
+    if match:
+        return json.loads(match.group(1))
+
+    # Cas 2 : premier { ... } trouvé dans le texte
+    match = re.search(r"\{.*\}", raw, re.DOTALL)
+    if match:
+        return json.loads(match.group(0))
+
+    raise ValueError(f"Aucun JSON valide trouvé dans la réponse. Extrait reçu : {raw[:300]}")
+
 
 def _build_prompt(book: "Book") -> str:
     themes = (
@@ -43,57 +62,39 @@ def _build_prompt(book: "Book") -> str:
         if book.user_notes
         else "Aucune note personnelle fournie."
     )
-    return f"""
-Tu es un assistant philosophique et politique.
-À partir des informations suivantes sur un livre, génère une fiche de lecture structurée.
+    return f"""Tu es un assistant philosophique et politique francophone.
+Génère une fiche de lecture structurée pour le livre suivant.
 
-Livre : "{book.title}"
+Titre : "{book.title}"
 Auteur : {book.author}
 Type : {book.type_label}
-Statut de lecture : {book.status_label}
+Statut : {book.status_label}
 {notes_section}
 
-Thèmes principaux de l'utilisateur : {themes}
+Thèmes de référence : {themes}
 
-Réponds UNIQUEMENT en JSON valide, sans texte avant ou après, avec exactement ces clés :
+Réponds UNIQUEMENT avec un objet JSON valide (pas de texte avant ni après), avec exactement ces 5 clés :
 {{
-  "summary": "Résumé en 5-8 lignes du livre",
+  "summary": "Résumé en 5-8 lignes",
   "concepts": "Liste markdown des concepts clés (- Concept : explication)",
-  "quotes": "3-5 citations essentielles avec numéro de page approximatif si connu",
-  "links_to_themes": "Comment ce livre s'articule aux thèmes : {themes}",
-  "usage_ideas": "3 idées d'usage concrètes (thread, scène de roman, argument d'essai)"
-}}
-""".strip()
+  "quotes": "3-5 citations essentielles",
+  "links_to_themes": "Articulation avec les thèmes de référence",
+  "usage_ideas": "3 idées d'usage (thread, scène de roman, argument d'essai)"
+}}"""
 
-
-# ─── Fonction principale ──────────────────────────────────────────────────────
 
 def generate_book_summary(book: "Book") -> dict:
-    """
-    Génère la fiche de lecture d'un livre via l'API Perplexity.
-
-    Retourne un dict avec les clés :
-        summary, concepts, quotes, links_to_themes, usage_ideas
-    """
+    """Génère la fiche de lecture via l'API Perplexity sonar-pro."""
     client = _get_client()
     response = client.chat.completions.create(
         model="sonar-pro",
         messages=[
             {
                 "role": "system",
-                "content": (
-                    "Tu es un assistant philosophique et politique francophone. "
-                    "Tu réponds UNIQUEMENT en JSON valide, sans markdown autour, "
-                    "sans texte introductif ni conclusif."
-                ),
+                "content": "Tu es un assistant philosophique francophone. Tu réponds UNIQUEMENT avec un objet JSON valide, sans texte avant ni après, sans balises markdown.",
             },
             {"role": "user", "content": _build_prompt(book)},
         ],
     )
-    raw = response.choices[0].message.content.strip()
-    # Nettoyage au cas où le modèle entoure le JSON de ```json ... ```
-    if raw.startswith("```"):
-        raw = raw.split("```")[1]
-        if raw.startswith("json"):
-            raw = raw[4:]
-    return json.loads(raw.strip())
+    raw = response.choices[0].message.content
+    return _extract_json(raw)

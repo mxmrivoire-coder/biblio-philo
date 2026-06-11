@@ -17,7 +17,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 from app.database import Base, engine
-from app.routers import books, concept_maps, problems
+from app.routers import admin, books, concept_maps, problems
 
 # ─── Initialisation de l'application ─────────────────────────────────────────
 app = FastAPI(
@@ -52,6 +52,9 @@ app.include_router(concept_maps.router)
 
 # Mode 3 — Problématiques et plans d'essais
 app.include_router(problems.router)
+
+# Administration (export/import)
+app.include_router(admin.router)
 
 
 # ─── Route racine ─────────────────────────────────────────────────────────────

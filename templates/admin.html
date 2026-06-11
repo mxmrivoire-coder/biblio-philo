@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}Administration — Bibliothécaire philo{% endblock %}
+
+{% block content %}
+<div class="max-w-xl mx-auto">
+  <h1 class="text-2xl font-bold text-stone-900 mb-6">Administration</h1>
+
+  {% if error %}
+  <div class="bg-red-50 border border-red-300 text-red-800 rounded-lg p-4 mb-5 text-sm">{{ error }}</div>
+  {% endif %}
+
+  {% set flash = request.query_params.get('flash') %}
+  {% if flash and flash.startswith('import_ok') %}
+  <div class="bg-emerald-50 border border-emerald-300 text-emerald-800 rounded-lg p-4 mb-5 text-sm">
+    Import réussi — {{ flash }}
+  </div>
+  {% endif %}
+
+  <!-- Stats -->
+  <div class="grid grid-cols-3 gap-4 mb-8">
+    <div class="bg-white rounded-xl border border-stone-200 p-4 text-center">
+      <p class="text-3xl font-bold text-amber-600">{{ nb_books }}</p>
+      <p class="text-xs text-stone-500 mt-1">Livre{% if nb_books > 1 %}s{% endif %}</p>
+    </div>
+    <div class="bg-white rounded-xl border border-stone-200 p-4 text-center">
+      <p class="text-3xl font-bold text-amber-600">{{ nb_maps }}</p>
+      <p class="text-xs text-stone-500 mt-1">Carte{% if nb_maps > 1 %}s{% endif %}</p>
+    </div>
+    <div class="bg-white rounded-xl border border-stone-200 p-4 text-center">
+      <p class="text-3xl font-bold text-amber-600">{{ nb_problems }}</p>
+      <p class="text-xs text-stone-500 mt-1">Problématique{% if nb_problems > 1 %}s{% endif %}</p>
+    </div>
+  </div>
+
+  <!-- Export -->
+  <section class="bg-white rounded-xl border border-stone-200 p-6 mb-5">
+    <h2 class="text-base font-semibold text-stone-800 mb-1">Exporter la bibliothèque</h2>
+    <p class="text-sm text-stone-500 mb-4">
+      Télécharge un fichier JSON contenant tous tes livres, cartes et problématiques.
+      À faire <strong>avant chaque mise à jour</strong> si tu n'as pas de volume Railway configuré.
+    </p>
+    <a href="/admin/export"
+       class="inline-flex items-center gap-2 bg-amber-600 hover:bg-amber-700 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors">
+      ↓ Télécharger la sauvegarde JSON
+    </a>
+  </section>
+
+  <!-- Import -->
+  <section class="bg-white rounded-xl border border-stone-200 p-6">
+    <h2 class="text-base font-semibold text-stone-800 mb-1">Restaurer depuis une sauvegarde</h2>
+    <p class="text-sm text-stone-500 mb-4">
+      Importe un fichier JSON précédemment exporté. Les entrées déjà présentes en base ne sont pas écrasées.
+    </p>
+    <form action="/admin/import" method="post" enctype="multipart/form-data" class="flex items-center gap-3">
+      <input type="file" name="file" accept=".json" required
+             class="text-sm text-stone-600 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border file:border-stone-300 file:text-sm file:font-medium file:bg-stone-50 hover:file:bg-stone-100">
+      <button type="submit"
+              class="bg-stone-700 hover:bg-stone-800 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+        Restaurer
+      </button>
+    </form>
+  </section>
+</div>
+{% endblock %}
