@@ -18,6 +18,7 @@ from fastapi.templating import Jinja2Templates
 
 from app.database import Base, engine
 from app.routers import admin, books, concept_maps, problems
+from app.seed import run_seed
 
 # ─── Initialisation de l'application ─────────────────────────────────────────
 app = FastAPI(
@@ -30,6 +31,7 @@ app = FastAPI(
 # En production (Railway + Postgres), SQLAlchemy crée aussi les tables si elles
 # n'existent pas. Pour des migrations complexes, envisager Alembic plus tard.
 Base.metadata.create_all(bind=engine)
+run_seed()  # Insère les livres si la table est vide
 
 # ─── Templates Jinja2 ─────────────────────────────────────────────────────────
 _templates_path = Path(__file__).resolve().parent.parent / "templates"
