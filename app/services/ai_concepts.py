@@ -1,19 +1,26 @@
 """
 ai_concepts.py — Service de génération de cartes conceptuelles (Mode 2).
 
-Contient la fonction principale :
-    generate_concept_map(theme: str, authors: list[str]) -> dict
-
-──────────────────────────────────────────────────────────────────────────────
-COMMENT BRANCHER VOTRE API IA — même procédure que ai_books.py
-Repérez le bloc "── REMPLACER LE MOCK ICI ──" ci-dessous.
-──────────────────────────────────────────────────────────────────────────────
+API : Perplexity (compatible OpenAI SDK)
+Modèle : llama-3.1-sonar-large-128k-online
+Clé   : variable d'environnement AI_API_KEY
 """
 
+import json
 import os
 
+from openai import OpenAI
 
-# ─── Construction du prompt ───────────────────────────────────────────────────
+
+def _get_client() -> OpenAI:
+    api_key = os.environ.get("AI_API_KEY")
+    if not api_key:
+        raise RuntimeError("Variable d'environnement AI_API_KEY manquante.")
+    return OpenAI(
+        api_key=api_key,
+        base_url="https://api.perplexity.ai",
+    )
+
 
 def _build_prompt(theme: str, authors: list[str]) -> str:
     authors_str = ", ".join(authors) if authors else "auteurs non précisés"
@@ -24,7 +31,7 @@ Génère une carte conceptuelle structurée autour du thème suivant.
 Thème : {theme}
 Auteurs impliqués : {authors_str}
 
-Réponds en JSON valide avec exactement ces clés :
+Réponds UNIQUEMENT en JSON valide, sans texte avant ou après, avec exactement ces clés :
 {{
   "nodes": {{
     "authors": ["Auteur1", "Auteur2"],
@@ -44,73 +51,27 @@ Les `examples` doivent être des situations historiques, œuvres ou événements
 """.strip()
 
 
-# ─── Fonction principale ──────────────────────────────────────────────────────
-
 def generate_concept_map(theme: str, authors: list[str]) -> dict:
     """
-    Génère la structure d'une carte conceptuelle.
-
-    Retourne un dict avec les clés :
-        nodes       : {"authors": [...], "concepts": [...], "examples": [...]}
-        edges       : [{"from": ..., "to": ..., "description": ...}, ...]
-        summary_10_lines : str
-
-    ── REMPLACER LE MOCK ICI ────────────────────────────────────────────────
-    # from openai import OpenAI
-    # import json, os
-    # client = OpenAI(
-    #     api_key=os.environ["AI_API_KEY"],
-    #     base_url="https://api.perplexity.ai",  # Supprimer pour OpenAI pur
-    # )
-    # response = client.chat.completions.create(
-    #     model="llama-3.1-sonar-large-128k-online",
-    #     messages=[
-    #         {"role": "system", "content": "Tu es un assistant philosophique."},
-    #         {"role": "user", "content": _build_prompt(theme, authors)},
-    #     ],
-    #     response_format={"type": "json_object"},
-    # )
-    # return json.loads(response.choices[0].message.content)
-    ─────────────────────────────────────────────────────────────────────────
+    Génère la structure d'une carte conceptuelle via l'API Perplexity.
     """
-
-    # ── MOCK ──────────────────────────────────────────────────────────────────
-    mock_authors = authors if authors else ["Auteur A", "Auteur B"]
-    return {
-        "nodes": {
-            "authors": mock_authors,
-            "concepts": [
-                "[MOCK] Concept central 1",
-                "[MOCK] Concept central 2",
-                "[MOCK] Concept dérivé 3",
-            ],
-            "examples": [
-                "[MOCK] Exemple historique 1",
-                "[MOCK] Exemple contemporain 2",
-            ],
-        },
-        "edges": [
+    client = _get_client()
+    response = client.chat.completions.create(
+        model="llama-3.1-sonar-large-128k-online",
+        messages=[
             {
-                "from": mock_authors[0] if mock_authors else "Auteur A",
-                "to": "[MOCK] Concept central 1",
-                "description": "[MOCK] théorise",
+                "role": "system",
+                "content": (
+                    "Tu es un assistant philosophique francophone. "
+                    "Tu réponds UNIQUEMENT en JSON valide, sans markdown autour."
+                ),
             },
-            {
-                "from": "[MOCK] Concept central 1",
-                "to": "[MOCK] Exemple historique 1",
-                "description": "[MOCK] s'illustre dans",
-            },
-            {
-                "from": mock_authors[-1] if len(mock_authors) > 1 else "[MOCK] Auteur B",
-                "to": "[MOCK] Concept central 2",
-                "description": "[MOCK] critique via",
-            },
+            {"role": "user", "content": _build_prompt(theme, authors)},
         ],
-        "summary_10_lines": (
-            f"[MOCK] Synthèse de la carte conceptuelle sur le thème : {theme}.\n"
-            "Cette synthèse est un placeholder en attente du branchement IA.\n"
-            "Elle résumera en 10 lignes les articulations entre les auteurs,\n"
-            "les concepts clés et les exemples concrets identifiés."
-        ),
-    }
-    # ── FIN MOCK ──────────────────────────────────────────────────────────────
+    )
+    raw = response.choices[0].message.content.strip()
+    if raw.startswith("```"):
+        raw = raw.split("```")[1]
+        if raw.startswith("json"):
+            raw = raw[4:]
+    return json.loads(raw.strip())

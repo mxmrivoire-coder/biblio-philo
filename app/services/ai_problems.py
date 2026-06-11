@@ -1,19 +1,26 @@
 """
 ai_problems.py — Service de génération de problématiques et plans (Mode 3).
 
-Contient la fonction principale :
-    generate_problems_and_plans(theme, authors, orientation) -> dict
-
-──────────────────────────────────────────────────────────────────────────────
-COMMENT BRANCHER VOTRE API IA — même procédure que ai_books.py
-Repérez le bloc "── REMPLACER LE MOCK ICI ──" ci-dessous.
-──────────────────────────────────────────────────────────────────────────────
+API : Perplexity (compatible OpenAI SDK)
+Modèle : llama-3.1-sonar-large-128k-online
+Clé   : variable d'environnement AI_API_KEY
 """
 
+import json
 import os
 
+from openai import OpenAI
 
-# ─── Construction du prompt ───────────────────────────────────────────────────
+
+def _get_client() -> OpenAI:
+    api_key = os.environ.get("AI_API_KEY")
+    if not api_key:
+        raise RuntimeError("Variable d'environnement AI_API_KEY manquante.")
+    return OpenAI(
+        api_key=api_key,
+        base_url="https://api.perplexity.ai",
+    )
+
 
 def _build_prompt(theme: str, authors: list[str], orientation: str) -> str:
     authors_str = ", ".join(authors) if authors else "auteurs non précisés"
@@ -30,7 +37,7 @@ Thème : {theme}
 Auteurs de référence : {authors_str}
 Orientation des plans : {orientation_label}
 
-Réponds en JSON valide avec exactement ces clés :
+Réponds UNIQUEMENT en JSON valide, sans texte avant ou après, avec exactement ces clés :
 {{
   "problems": [
     "Problématique 1 sous forme de question philosophique précise ?",
@@ -67,78 +74,27 @@ Réponds en JSON valide avec exactement ces clés :
 """.strip()
 
 
-# ─── Fonction principale ──────────────────────────────────────────────────────
-
-def generate_problems_and_plans(
-    theme: str, authors: list[str], orientation: str
-) -> dict:
+def generate_problems_and_plans(theme: str, authors: list[str], orientation: str) -> dict:
     """
-    Génère des problématiques et leurs plans I/II/III.
-
-    Paramètres :
-        theme       : thème libre (ex. "Travail, absurde et domination")
-        authors     : liste d'auteurs (ex. ["Marx", "Camus", "Fanon"])
-        orientation : "thread" ou "essai"
-
-    Retourne un dict avec les clés :
-        problems : list[str]
-        plans    : list[{"problem": str, "plan": {"I": {...}, "II": {...}, "III": {...}}}]
-
-    ── REMPLACER LE MOCK ICI ────────────────────────────────────────────────
-    # from openai import OpenAI
-    # import json, os
-    # client = OpenAI(
-    #     api_key=os.environ["AI_API_KEY"],
-    #     base_url="https://api.perplexity.ai",  # Supprimer pour OpenAI pur
-    # )
-    # response = client.chat.completions.create(
-    #     model="llama-3.1-sonar-large-128k-online",
-    #     messages=[
-    #         {"role": "system", "content": "Tu es un assistant philosophique."},
-    #         {"role": "user", "content": _build_prompt(theme, authors, orientation)},
-    #     ],
-    #     response_format={"type": "json_object"},
-    # )
-    # return json.loads(response.choices[0].message.content)
-    ─────────────────────────────────────────────────────────────────────────
+    Génère des problématiques et leurs plans I/II/III via l'API Perplexity.
     """
-
-    # ── MOCK ──────────────────────────────────────────────────────────────────
-    pb1 = f"[MOCK] En quoi le thème « {theme} » révèle-t-il une tension fondamentale entre liberté et contrainte ?"
-    pb2 = f"[MOCK] Comment les auteurs {', '.join(authors[:2]) if authors else 'choisis'} permettent-ils de repenser « {theme} » à l'aune des rapports de domination contemporains ?"
-
-    plan_template = lambda pb: {
-        "problem": pb,
-        "plan": {
-            "I": {
-                "title": "[MOCK] Première thèse : le constat",
-                "points": [
-                    "[MOCK] Sous-point 1A : ancrage théorique",
-                    "[MOCK] Sous-point 1B : illustration",
-                    "[MOCK] Sous-point 1C : limite du constat",
-                ],
+    client = _get_client()
+    response = client.chat.completions.create(
+        model="llama-3.1-sonar-large-128k-online",
+        messages=[
+            {
+                "role": "system",
+                "content": (
+                    "Tu es un assistant philosophique francophone. "
+                    "Tu réponds UNIQUEMENT en JSON valide, sans markdown autour."
+                ),
             },
-            "II": {
-                "title": "[MOCK] Deuxième thèse : la contradiction",
-                "points": [
-                    "[MOCK] Sous-point 2A : retournement critique",
-                    "[MOCK] Sous-point 2B : apport d'un auteur de référence",
-                    "[MOCK] Sous-point 2C : tension non résolue",
-                ],
-            },
-            "III": {
-                "title": "[MOCK] Troisième thèse : le dépassement",
-                "points": [
-                    "[MOCK] Sous-point 3A : proposition constructive",
-                    "[MOCK] Sous-point 3B : ancrage dans le réel contemporain",
-                    "[MOCK] Sous-point 3C : ouverture",
-                ],
-            },
-        },
-    }
-
-    return {
-        "problems": [pb1, pb2],
-        "plans": [plan_template(pb1), plan_template(pb2)],
-    }
-    # ── FIN MOCK ──────────────────────────────────────────────────────────────
+            {"role": "user", "content": _build_prompt(theme, authors, orientation)},
+        ],
+    )
+    raw = response.choices[0].message.content.strip()
+    if raw.startswith("```"):
+        raw = raw.split("```")[1]
+        if raw.startswith("json"):
+            raw = raw[4:]
+    return json.loads(raw.strip())
