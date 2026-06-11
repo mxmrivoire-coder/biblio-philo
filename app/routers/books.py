@@ -143,11 +143,17 @@ async def generate_fiche(
             status_code=500,
         )
 
-    book.ai_summary = result.get("summary")
-    book.ai_concepts = result.get("concepts")
-    book.ai_quotes = result.get("quotes")
-    book.ai_links_to_themes = result.get("links_to_themes")
-    book.ai_usage_ideas = result.get("usage_ideas")
+    def _to_str(val) -> str:
+        """Convertit une valeur en string — au cas où l'IA renvoie une liste."""
+        if isinstance(val, list):
+            return "\n".join(str(v) for v in val)
+        return str(val) if val is not None else ""
+
+    book.ai_summary = _to_str(result.get("summary"))
+    book.ai_concepts = _to_str(result.get("concepts"))
+    book.ai_quotes = _to_str(result.get("quotes"))
+    book.ai_links_to_themes = _to_str(result.get("links_to_themes"))
+    book.ai_usage_ideas = _to_str(result.get("usage_ideas"))
     db.commit()
 
     return RedirectResponse(url=f"/books/{book_id}?flash=fiche_generated", status_code=303)
