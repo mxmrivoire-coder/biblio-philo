@@ -2,10 +2,13 @@
 {% block title %}Cartes conceptuelles — Bibliothécaire philo{% endblock %}
 
 {% block content %}
-<div class="flex items-center justify-between mb-6">
-  <h1 class="text-2xl font-bold text-stone-900">Cartes conceptuelles</h1>
+<div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
+  <div>
+    <h1 class="font-serif text-3xl text-ink font-semibold leading-tight">Cartes conceptuelles</h1>
+    <p class="text-ink-muted text-sm mt-1">Croiser auteurs, concepts et exemples autour d'un thème</p>
+  </div>
   <a href="/concept-maps/new"
-     class="inline-flex items-center gap-2 bg-amber-600 hover:bg-amber-700 text-white text-sm font-medium px-4 py-2 rounded-lg shadow transition-colors">
+     class="inline-flex items-center gap-2 bg-bordeaux hover:bg-bordeaux-dark text-ivory text-sm font-medium px-4 py-2.5 rounded-lg shadow-sm self-start sm:self-auto">
     + Nouvelle carte
   </a>
 </div>
@@ -14,31 +17,34 @@
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
   {% for m in maps %}
   <a href="/concept-maps/{{ m.id }}"
-     class="block bg-white rounded-xl shadow-sm border border-stone-200 p-5 hover:shadow-md hover:border-amber-300 transition-all">
-    <h2 class="font-semibold text-stone-900 mb-1">{{ m.title }}</h2>
-    <p class="text-xs text-stone-500 mb-3">Thème : {{ m.theme }}</p>
+     class="block bg-white rounded-xl border border-cream-dark p-5 hover:shadow-md hover:border-bordeaux/30 transition-all group">
+    <h2 class="font-serif text-base font-semibold text-ink group-hover:text-bordeaux transition-colors mb-1 leading-snug">
+      {{ m.title }}
+    </h2>
+    <p class="text-xs text-ink-muted mb-3">{{ m.theme }}</p>
     {% if m.authors_list %}
-    <div class="flex flex-wrap gap-1">
+    <div class="flex flex-wrap gap-1 mb-3">
       {% for author in m.authors_list %}
-      <span class="text-xs bg-stone-100 text-stone-600 px-2 py-0.5 rounded-full">{{ author }}</span>
+      <span class="text-xs bg-cream text-ink-muted px-2 py-0.5 rounded-full border border-cream-dark">{{ author }}</span>
       {% endfor %}
     </div>
     {% endif %}
-    <p class="text-xs text-stone-400 mt-3">
-      {{ m.nodes_dict.concepts | length }} concept{% if m.nodes_dict.concepts | length != 1 %}s{% endif %} ·
-      {{ m.edges_list | length }} lien{% if m.edges_list | length != 1 %}s{% endif %}
-    </p>
+    <div class="flex gap-3 text-xs text-ink-muted/60 border-t border-cream-dark pt-3 mt-2">
+      <span>{{ m.nodes_dict.concepts | length }} concept{% if m.nodes_dict.concepts | length != 1 %}s{% endif %}</span>
+      <span>·</span>
+      <span>{{ m.edges_list | length }} lien{% if m.edges_list | length != 1 %}s{% endif %}</span>
+    </div>
   </a>
   {% endfor %}
 </div>
 
 {% else %}
-<div class="text-center py-20 text-stone-400">
-  <p class="text-5xl mb-4">🗺️</p>
-  <p class="text-lg font-medium mb-2">Aucune carte conceptuelle pour l'instant.</p>
-  <p class="text-sm mb-6">Créez votre première carte en croisant auteurs et concepts.</p>
+<div class="text-center py-24 text-ink-muted">
+  <p class="font-serif text-5xl mb-5 opacity-20">⊙</p>
+  <p class="font-serif text-xl text-ink mb-2">Aucune carte conceptuelle</p>
+  <p class="text-sm mb-8">Créez votre première carte en croisant auteurs et concepts.</p>
   <a href="/concept-maps/new"
-     class="bg-amber-600 hover:bg-amber-700 text-white px-5 py-2.5 rounded-lg text-sm font-medium transition-colors">
+     class="bg-bordeaux hover:bg-bordeaux-dark text-ivory px-6 py-3 rounded-lg text-sm font-medium">
     + Nouvelle carte
   </a>
 </div>

@@ -2,58 +2,136 @@
 {% block title %}Livres — Bibliothécaire philo{% endblock %}
 
 {% block content %}
-<div class="flex items-center justify-between mb-6">
-  <h1 class="text-2xl font-bold text-stone-900">Ma bibliothèque</h1>
+
+<!-- ── En-tête de page ─────────────────────────────────────────────── -->
+<div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
+  <div>
+    <h1 class="font-serif text-3xl text-ink font-semibold leading-tight">Ma bibliothèque</h1>
+    <p class="text-ink-muted text-sm mt-1">Lectures philosophiques, politiques &amp; littéraires</p>
+  </div>
   <a href="/books/new"
-     class="inline-flex items-center gap-2 bg-amber-600 hover:bg-amber-700 text-white text-sm font-medium px-4 py-2 rounded-lg shadow transition-colors">
+     class="inline-flex items-center gap-2 bg-bordeaux hover:bg-bordeaux-dark text-ivory text-sm font-medium px-4 py-2.5 rounded-lg shadow-sm self-start sm:self-auto">
     + Ajouter un livre
   </a>
 </div>
 
 {% if books %}
-<div class="overflow-x-auto rounded-xl shadow-sm border border-stone-200">
-  <table class="w-full text-sm bg-white">
-    <thead class="bg-stone-100 text-stone-600 text-left text-xs uppercase tracking-wider">
-      <tr>
-        <th class="px-4 py-3">Titre</th>
-        <th class="px-4 py-3">Auteur</th>
-        <th class="px-4 py-3">Type</th>
-        <th class="px-4 py-3">Statut</th>
-        <th class="px-4 py-3">Fiche IA</th>
-        <th class="px-4 py-3">Actions</th>
+
+<!-- ── Bloc de synthèse ────────────────────────────────────────────── -->
+{% set nb_total    = books|length %}
+{% set nb_encours  = books|selectattr('status','eq','en_cours')|list|length %}
+{% set nb_termine  = books|selectattr('status','eq','terminé')|list|length %}
+{% set nb_ai       = books|selectattr('has_ai_content')|list|length %}
+
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-7">
+  <div class="bg-cream rounded-xl border border-cream-dark px-4 py-3">
+    <p class="font-serif text-2xl font-semibold text-ink">{{ nb_total }}</p>
+    <p class="text-xs text-ink-muted mt-0.5">Livre{% if nb_total > 1 %}s{% endif %}</p>
+  </div>
+  <div class="bg-cream rounded-xl border border-cream-dark px-4 py-3">
+    <p class="font-serif text-2xl font-semibold text-ink">{{ nb_encours }}</p>
+    <p class="text-xs text-ink-muted mt-0.5">En cours</p>
+  </div>
+  <div class="bg-cream rounded-xl border border-cream-dark px-4 py-3">
+    <p class="font-serif text-2xl font-semibold text-ink">{{ nb_termine }}</p>
+    <p class="text-xs text-ink-muted mt-0.5">Terminé{% if nb_termine > 1 %}s{% endif %}</p>
+  </div>
+  <div class="bg-cream rounded-xl border border-cream-dark px-4 py-3">
+    <p class="font-serif text-2xl font-semibold text-bordeaux">{{ nb_ai }}</p>
+    <p class="text-xs text-ink-muted mt-0.5">Fiche IA</p>
+  </div>
+</div>
+
+<!-- ── Barre de recherche + filtres ───────────────────────────────── -->
+<div class="flex flex-col sm:flex-row gap-3 mb-5">
+  <input type="text" id="search-input" placeholder="Rechercher titre ou auteur…"
+         class="flex-1 border border-cream-dark bg-white rounded-lg px-4 py-2 text-sm text-ink placeholder-ink-muted/50 focus:outline-none focus:ring-2 focus:ring-bordeaux/30 focus:border-bordeaux">
+
+  <select id="filter-type"
+          class="border border-cream-dark bg-white rounded-lg px-3 py-2 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-bordeaux/30">
+    <option value="">Tous les types</option>
+    <option value="roman">Roman</option>
+    <option value="essai_philo">Essai philosophique</option>
+    <option value="essai_politique">Essai politique</option>
+    <option value="socio">Sociologie</option>
+  </select>
+
+  <select id="filter-status"
+          class="border border-cream-dark bg-white rounded-lg px-3 py-2 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-bordeaux/30">
+    <option value="">Tous les statuts</option>
+    <option value="en_cours">En cours</option>
+    <option value="terminé">Terminés</option>
+  </select>
+</div>
+
+<!-- ── Table des livres ────────────────────────────────────────────── -->
+<div class="rounded-xl border border-cream-dark overflow-hidden shadow-sm">
+  <table class="w-full text-sm bg-white" id="books-table">
+    <thead>
+      <tr class="border-b border-cream-dark bg-cream text-xs uppercase tracking-widest text-ink-muted">
+        <th class="px-5 py-3 text-left font-medium">Titre</th>
+        <th class="px-4 py-3 text-left font-medium hidden sm:table-cell">Auteur</th>
+        <th class="px-4 py-3 text-left font-medium hidden md:table-cell">Type</th>
+        <th class="px-4 py-3 text-left font-medium">Statut</th>
+        <th class="px-4 py-3 text-center font-medium hidden sm:table-cell" title="Fiche IA générée">IA</th>
+        <th class="px-4 py-3 text-right font-medium"></th>
       </tr>
     </thead>
-    <tbody class="divide-y divide-stone-100">
+    <tbody class="divide-y divide-cream-dark/60" id="books-tbody">
       {% for book in books %}
-      <tr class="hover:bg-stone-50 transition-colors">
-        <td class="px-4 py-3 font-medium">{{ book.title }}</td>
-        <td class="px-4 py-3 text-stone-600">{{ book.author }}</td>
-        <td class="px-4 py-3">
-          <span class="inline-block px-2 py-0.5 rounded-full text-xs font-medium
-            {% if book.type == 'roman' %}bg-blue-100 text-blue-700
-            {% elif book.type == 'essai_philo' %}bg-purple-100 text-purple-700
-            {% elif book.type == 'essai_politique' %}bg-red-100 text-red-700
-            {% else %}bg-green-100 text-green-700{% endif %}">
+      <tr class="book-row hover:bg-ivory transition-colors"
+          data-title="{{ book.title|lower }}"
+          data-author="{{ book.author|lower }}"
+          data-type="{{ book.type }}"
+          data-status="{{ book.status }}">
+
+        <!-- Titre -->
+        <td class="px-5 py-3.5">
+          <a href="/books/{{ book.id }}" class="font-medium text-ink hover:text-bordeaux leading-snug">
+            {{ book.title }}
+          </a>
+          <!-- Auteur visible sur mobile sous le titre -->
+          <p class="text-xs text-ink-muted mt-0.5 sm:hidden">{{ book.author }}</p>
+        </td>
+
+        <!-- Auteur -->
+        <td class="px-4 py-3.5 text-ink-muted hidden sm:table-cell">{{ book.author }}</td>
+
+        <!-- Type -->
+        <td class="px-4 py-3.5 hidden md:table-cell">
+          <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-medium
+            {% if book.type == 'roman' %}badge-roman
+            {% elif book.type == 'essai_philo' %}badge-philo
+            {% elif book.type == 'essai_politique' %}badge-politique
+            {% else %}badge-socio{% endif %}">
             {{ book.type_label }}
           </span>
         </td>
-        <td class="px-4 py-3">
-          <span class="inline-block px-2 py-0.5 rounded-full text-xs font-medium
-            {% if book.status == 'terminé' %}bg-emerald-100 text-emerald-700
-            {% else %}bg-orange-100 text-orange-700{% endif %}">
+
+        <!-- Statut -->
+        <td class="px-4 py-3.5">
+          <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium
+            {% if book.status == 'terminé' %}badge-termine{% else %}badge-encours{% endif %}">
+            <span class="w-1.5 h-1.5 rounded-full {% if book.status == 'terminé' %}bg-sage{% else %}bg-amber-500{% endif %}"></span>
             {{ book.status_label }}
           </span>
         </td>
-        <td class="px-4 py-3 text-center">
+
+        <!-- IA -->
+        <td class="px-4 py-3.5 text-center hidden sm:table-cell">
           {% if book.has_ai_content %}
-            <span title="Fiche générée" class="text-emerald-500">✓</span>
+            <span title="Fiche générée" class="text-sage text-base">✦</span>
           {% else %}
-            <span title="Pas encore générée" class="text-stone-300">–</span>
+            <span title="Non générée" class="text-ink-muted/30 text-base">·</span>
           {% endif %}
         </td>
-        <td class="px-4 py-3">
+
+        <!-- Action -->
+        <td class="px-4 py-3.5 text-right">
           <a href="/books/{{ book.id }}"
-             class="text-amber-600 hover:text-amber-800 font-medium mr-3">Ouvrir</a>
+             class="text-xs font-medium text-bordeaux hover:text-bordeaux-dark border border-bordeaux/30 hover:border-bordeaux px-3 py-1.5 rounded-lg">
+            Ouvrir
+          </a>
         </td>
       </tr>
       {% endfor %}
@@ -61,17 +139,53 @@
   </table>
 </div>
 
-<p class="text-xs text-stone-400 mt-3">{{ books|length }} livre{% if books|length > 1 %}s{% endif %} enregistré{% if books|length > 1 %}s{% endif %}.</p>
+<!-- Compteur résultats -->
+<p class="text-xs text-ink-muted mt-3" id="results-count">
+  {{ books|length }} livre{% if books|length > 1 %}s{% endif %}
+</p>
+
+<!-- ── JS : recherche + filtres côté client ────────────────────────── -->
+<script>
+  const searchInput  = document.getElementById('search-input');
+  const filterType   = document.getElementById('filter-type');
+  const filterStatus = document.getElementById('filter-status');
+  const rows         = document.querySelectorAll('.book-row');
+  const counter      = document.getElementById('results-count');
+
+  function applyFilters() {
+    const q      = searchInput.value.toLowerCase().trim();
+    const type   = filterType.value;
+    const status = filterStatus.value;
+    let visible  = 0;
+
+    rows.forEach(row => {
+      const matchText   = !q || row.dataset.title.includes(q) || row.dataset.author.includes(q);
+      const matchType   = !type   || row.dataset.type   === type;
+      const matchStatus = !status || row.dataset.status === status;
+      const show = matchText && matchType && matchStatus;
+      row.style.display = show ? '' : 'none';
+      if (show) visible++;
+    });
+
+    counter.textContent = visible + ' livre' + (visible > 1 ? 's' : '');
+  }
+
+  searchInput.addEventListener('input',  applyFilters);
+  filterType.addEventListener('change',  applyFilters);
+  filterStatus.addEventListener('change', applyFilters);
+</script>
 
 {% else %}
-<div class="text-center py-20 text-stone-400">
-  <p class="text-5xl mb-4">📖</p>
-  <p class="text-lg font-medium mb-2">Aucun livre pour l'instant.</p>
-  <p class="text-sm mb-6">Commencez par ajouter un livre à votre bibliothèque.</p>
+<!-- État vide -->
+<div class="text-center py-24 text-ink-muted">
+  <p class="font-serif text-5xl mb-5 text-ink-muted/30">§</p>
+  <p class="font-serif text-xl text-ink mb-2">Bibliothèque vide</p>
+  <p class="text-sm mb-8">Commencez par ajouter votre premier livre.</p>
   <a href="/books/new"
-     class="bg-amber-600 hover:bg-amber-700 text-white px-5 py-2.5 rounded-lg text-sm font-medium transition-colors">
+     class="bg-bordeaux hover:bg-bordeaux-dark text-ivory px-6 py-3 rounded-lg text-sm font-medium">
     + Ajouter un livre
   </a>
 </div>
 {% endif %}
+
 {% endblock %}

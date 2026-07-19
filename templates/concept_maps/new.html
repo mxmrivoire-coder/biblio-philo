@@ -3,17 +3,15 @@
 
 {% block content %}
 <div class="max-w-xl mx-auto">
-  <div class="flex items-center gap-3 mb-6">
-    <a href="/concept-maps" class="text-stone-400 hover:text-stone-600 text-sm">← Retour</a>
-    <h1 class="text-2xl font-bold text-stone-900">Nouvelle carte conceptuelle</h1>
-  </div>
+  <a href="/concept-maps" class="text-xs text-ink-muted hover:text-bordeaux inline-flex items-center gap-1 mb-5">← Cartes</a>
+  <h1 class="font-serif text-3xl text-ink font-semibold mb-7">Nouvelle carte conceptuelle</h1>
 
   {% if error %}
-  <div class="bg-red-50 border border-red-300 text-red-800 rounded-lg p-4 mb-5 text-sm">
+  <div class="bg-red-50 border border-red-200 text-red-800 rounded-lg p-4 mb-5 text-sm">
     <p class="font-semibold mb-1">{{ error }}</p>
     {% if error_detail %}
     <details class="mt-2">
-      <summary class="cursor-pointer text-xs text-red-500">Détail technique</summary>
+      <summary class="cursor-pointer text-xs text-red-400">Détail technique</summary>
       <pre class="mt-2 text-xs overflow-auto whitespace-pre-wrap">{{ error_detail }}</pre>
     </details>
     {% endif %}
@@ -21,59 +19,56 @@
   {% endif %}
 
   <form action="/concept-maps" method="post"
-        class="bg-white rounded-xl shadow-sm border border-stone-200 p-6 space-y-5">
+        class="bg-white rounded-xl border border-cream-dark shadow-sm p-6 space-y-5">
 
     <div>
-      <label for="title" class="block text-sm font-medium text-stone-700 mb-1">
-        Titre de la carte <span class="text-red-500">*</span>
+      <label for="title" class="block text-xs font-semibold uppercase tracking-widest text-ink-muted mb-2">
+        Titre <span class="text-bordeaux normal-case tracking-normal font-normal">*</span>
       </label>
-      <input type="text" id="title" name="title" required
-             class="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
-             placeholder="Ex. : Aliénation – Marx/Camus/Fanon">
+      <input type="text" id="title" name="title" required autocomplete="off"
+             class="w-full border border-cream-dark bg-ivory rounded-lg px-4 py-2.5 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-bordeaux/30 focus:border-bordeaux"
+             placeholder="ex. : Aliénation – Marx / Camus / Fanon">
     </div>
 
     <div>
-      <label for="theme" class="block text-sm font-medium text-stone-700 mb-1">
-        Thème central <span class="text-red-500">*</span>
+      <label for="theme" class="block text-xs font-semibold uppercase tracking-widest text-ink-muted mb-2">
+        Thème central <span class="text-bordeaux normal-case tracking-normal font-normal">*</span>
       </label>
-      <input type="text" id="theme" name="theme" required
-             class="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
-             placeholder="Ex. : aliénation, domination, post-vérité…">
+      <input type="text" id="theme" name="theme" required autocomplete="off"
+             class="w-full border border-cream-dark bg-ivory rounded-lg px-4 py-2.5 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-bordeaux/30 focus:border-bordeaux"
+             placeholder="ex. : aliénation, domination, post-vérité…">
     </div>
 
     <div>
-      <label class="block text-sm font-medium text-stone-700 mb-2">Auteurs impliqués</label>
-      <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+      <label class="block text-xs font-semibold uppercase tracking-widest text-ink-muted mb-3">Auteurs impliqués</label>
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-y-2 gap-x-3">
         {% for author in predefined_authors %}
-        <label class="flex items-center gap-2 text-sm cursor-pointer">
+        <label class="flex items-center gap-2 text-sm cursor-pointer group">
           <input type="checkbox" name="authors" value="{{ author }}"
-                 class="rounded border-stone-300 text-amber-600 focus:ring-amber-500">
-          <span>{{ author }}</span>
+                 class="rounded border-cream-dark text-bordeaux focus:ring-bordeaux/30 accent-bordeaux">
+          <span class="text-ink group-hover:text-bordeaux transition-colors">{{ author }}</span>
         </label>
         {% endfor %}
       </div>
     </div>
 
     <div>
-      <label for="extra_author" class="block text-sm font-medium text-stone-700 mb-1">
-        Autre auteur (libre)
-      </label>
-      <input type="text" id="extra_author" name="extra_author"
-             class="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
-             placeholder="Ex. : Rosa Luxemburg, W.E.B. Du Bois…">
+      <label for="extra_author" class="block text-xs font-semibold uppercase tracking-widest text-ink-muted mb-2">Autre auteur</label>
+      <input type="text" id="extra_author" name="extra_author" autocomplete="off"
+             class="w-full border border-cream-dark bg-ivory rounded-lg px-4 py-2.5 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-bordeaux/30"
+             placeholder="ex. : Rosa Luxemburg, W.E.B. Du Bois…">
     </div>
 
     <div class="pt-2 flex gap-3">
       <button type="submit"
-              class="bg-amber-600 hover:bg-amber-700 text-white px-5 py-2.5 rounded-lg text-sm font-medium transition-colors">
+              class="inline-flex items-center gap-2 bg-bordeaux hover:bg-bordeaux-dark text-ivory px-5 py-2.5 rounded-lg text-sm font-medium shadow-sm">
         ✦ Générer la carte
       </button>
       <a href="/concept-maps"
-         class="px-5 py-2.5 rounded-lg text-sm font-medium border border-stone-300 hover:bg-stone-100 transition-colors">
+         class="px-5 py-2.5 rounded-lg text-sm font-medium border border-cream-dark hover:bg-cream text-ink-muted hover:text-ink">
         Annuler
       </a>
     </div>
-
   </form>
 </div>
 {% endblock %}

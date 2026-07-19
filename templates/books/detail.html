@@ -4,124 +4,121 @@
 {% block content %}
 
 {% if error %}
-<div class="bg-red-50 border border-red-300 text-red-800 rounded-lg p-4 mb-5 text-sm">
+<div class="bg-red-50 border border-red-200 text-red-800 rounded-lg p-4 mb-6 text-sm">
   <p class="font-semibold mb-1">{{ error }}</p>
   {% if error_detail %}
   <details class="mt-2">
-    <summary class="cursor-pointer text-xs text-red-500">Détail technique</summary>
-    <pre class="mt-2 text-xs overflow-auto whitespace-pre-wrap">{{ error_detail }}</pre>
+    <summary class="cursor-pointer text-xs text-red-400 hover:text-red-600">Détail technique</summary>
+    <pre class="mt-2 text-xs overflow-auto whitespace-pre-wrap leading-relaxed">{{ error_detail }}</pre>
   </details>
   {% endif %}
 </div>
 {% endif %}
 
-<!-- En-tête du livre -->
-<div class="flex items-start justify-between mb-6 gap-4">
+<!-- ── En-tête ────────────────────────────────────────────────────── -->
+<div class="flex items-start justify-between gap-4 mb-7">
   <div>
-    <a href="/books" class="text-stone-400 hover:text-stone-600 text-sm">← Bibliothèque</a>
-    <h1 class="text-2xl font-bold text-stone-900 mt-1">{{ book.title }}</h1>
-    <p class="text-stone-500 text-sm mt-0.5">{{ book.author }}</p>
-    <div class="flex gap-2 mt-2">
-      <span class="inline-block px-2 py-0.5 rounded-full text-xs font-medium
-        {% if book.type == 'roman' %}bg-blue-100 text-blue-700
-        {% elif book.type == 'essai_philo' %}bg-purple-100 text-purple-700
-        {% elif book.type == 'essai_politique' %}bg-red-100 text-red-700
-        {% else %}bg-green-100 text-green-700{% endif %}">
+    <a href="/books" class="text-xs text-ink-muted hover:text-bordeaux inline-flex items-center gap-1 mb-3">
+      ← Bibliothèque
+    </a>
+    <h1 class="font-serif text-3xl text-ink font-semibold leading-tight">{{ book.title }}</h1>
+    <p class="text-ink-muted mt-1">{{ book.author }}</p>
+    <div class="flex flex-wrap gap-2 mt-3">
+      <span class="inline-block px-3 py-0.5 rounded-full text-xs font-medium
+        {% if book.type == 'roman' %}badge-roman
+        {% elif book.type == 'essai_philo' %}badge-philo
+        {% elif book.type == 'essai_politique' %}badge-politique
+        {% else %}badge-socio{% endif %}">
         {{ book.type_label }}
       </span>
-      <span class="inline-block px-2 py-0.5 rounded-full text-xs font-medium
-        {% if book.status == 'terminé' %}bg-emerald-100 text-emerald-700
-        {% else %}bg-orange-100 text-orange-700{% endif %}">
+      <span class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-medium
+        {% if book.status == 'terminé' %}badge-termine{% else %}badge-encours{% endif %}">
+        <span class="w-1.5 h-1.5 rounded-full {% if book.status == 'terminé' %}bg-sage{% else %}bg-amber-500{% endif %}"></span>
         {{ book.status_label }}
       </span>
     </div>
   </div>
 
   <div class="flex gap-2 shrink-0">
-  <!-- Modification -->
-  <a href="/books/{{ book.id }}/edit"
-     class="text-xs text-stone-600 hover:text-stone-800 border border-stone-300 hover:border-stone-500 px-3 py-1.5 rounded-lg transition-colors">
-    Modifier
-  </a>
-  <!-- Suppression -->
-  <form action="/books/{{ book.id }}/delete" method="post"
-        onsubmit="return confirm('Supprimer ce livre ?')">
-    <button type="submit"
-            class="text-xs text-red-400 hover:text-red-600 border border-red-200 hover:border-red-400 px-3 py-1.5 rounded-lg transition-colors">
-      Supprimer
-    </button>
-  </form>
+    <a href="/books/{{ book.id }}/edit"
+       class="text-xs font-medium text-ink-muted hover:text-ink border border-cream-dark hover:border-ink-muted px-3 py-1.5 rounded-lg">
+      Modifier
+    </a>
+    <form action="/books/{{ book.id }}/delete" method="post"
+          onsubmit="return confirm('Supprimer ce livre définitivement ?')">
+      <button type="submit"
+              class="text-xs font-medium text-red-400 hover:text-red-600 border border-red-200 hover:border-red-300 px-3 py-1.5 rounded-lg">
+        Supprimer
+      </button>
+    </form>
   </div>
 </div>
 
+<!-- ── Séparateur décoratif ───────────────────────────────────────── -->
+<div class="border-t border-cream-dark mb-7"></div>
+
+<!-- ── Grille principale ──────────────────────────────────────────── -->
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-  <!-- ── Colonne gauche : Notes brutes ────────────────────────────── -->
-  <section class="bg-white rounded-xl shadow-sm border border-stone-200 p-5">
-    <h2 class="text-base font-semibold text-stone-800 mb-3">Notes de lecture</h2>
+  <!-- Colonne gauche : Notes + génération IA -->
+  <section class="bg-white rounded-xl border border-cream-dark p-6 shadow-sm">
+    <h2 class="font-serif text-lg text-ink font-semibold mb-4">Notes de lecture</h2>
 
     <form action="/books/{{ book.id }}/notes" method="post" class="space-y-3">
-      <textarea
-        name="notes"
-        rows="10"
-        class="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-amber-500 resize-y"
-        placeholder="Vos annotations libres, citations repérées, réactions de lecture…">{{ book.user_notes or '' }}</textarea>
+      <textarea name="notes" rows="11"
+        class="w-full border border-cream-dark bg-ivory rounded-lg px-4 py-3 text-sm text-ink font-mono focus:outline-none focus:ring-2 focus:ring-bordeaux/30 focus:border-bordeaux resize-y leading-relaxed placeholder-ink-muted/40"
+        placeholder="Vos annotations libres, citations repérées, premières réactions…">{{ book.user_notes or '' }}</textarea>
       <button type="submit"
-              class="bg-stone-700 hover:bg-stone-800 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+              class="text-xs font-medium bg-ink hover:bg-ink-light text-ivory px-4 py-2 rounded-lg">
         Enregistrer les notes
       </button>
     </form>
 
-    <!-- Génération de la fiche IA -->
-    <div class="mt-5 pt-4 border-t border-stone-100">
-      <p class="text-xs text-stone-500 mb-2">
-        L'IA utilisera le titre, l'auteur, le type et vos notes pour générer la fiche.
+    <div class="mt-6 pt-5 border-t border-cream-dark">
+      <p class="text-xs text-ink-muted mb-3">
+        L'IA génère la fiche à partir du titre, de l'auteur, du type et de vos notes.
       </p>
       <form action="/books/{{ book.id }}/generate" method="post">
         <button type="submit"
-                class="inline-flex items-center gap-2 bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                class="inline-flex items-center gap-2 bg-bordeaux hover:bg-bordeaux-dark text-ivory text-sm font-medium px-4 py-2.5 rounded-lg shadow-sm">
           ✦ {% if book.has_ai_content %}Mettre à jour la fiche{% else %}Générer la fiche{% endif %}
         </button>
       </form>
-      {# ── POINT DE BRANCHEMENT IA ──────────────────────────────────────────
-         Ce bouton soumet à POST /books/{id}/generate.
-         La logique IA est dans app/services/ai_books.py → generate_book_summary()
-         ──────────────────────────────────────────────────────────────────── #}
     </div>
   </section>
 
-  <!-- ── Colonne droite : Fiche IA ────────────────────────────────── -->
-  <section class="bg-white rounded-xl shadow-sm border border-stone-200 p-5">
-    <h2 class="text-base font-semibold text-stone-800 mb-3">
+  <!-- Colonne droite : Fiche IA -->
+  <section class="bg-white rounded-xl border border-cream-dark p-6 shadow-sm">
+    <h2 class="font-serif text-lg text-ink font-semibold mb-1">
       Fiche de lecture
-      {% if book.has_ai_content %}
-        <span class="text-xs font-normal text-emerald-600 ml-2">● générée</span>
-      {% else %}
-        <span class="text-xs font-normal text-stone-400 ml-2">non générée</span>
-      {% endif %}
     </h2>
+    {% if book.has_ai_content %}
+      <p class="text-xs text-sage mb-5">✦ Générée par IA</p>
+    {% else %}
+      <p class="text-xs text-ink-muted mb-5">Non encore générée</p>
+    {% endif %}
 
     {% if book.has_ai_content %}
 
-      {% macro section_block(label, content) %}
+      {% macro fiche_block(label, content) %}
         {% if content %}
-        <div class="mb-4">
-          <h3 class="text-xs font-semibold uppercase tracking-wider text-stone-500 mb-1">{{ label }}</h3>
-          <div class="text-sm text-stone-700 whitespace-pre-wrap leading-relaxed">{{ content }}</div>
+        <div class="mb-5">
+          <h3 class="text-xs font-semibold uppercase tracking-widest text-ink-muted mb-2">{{ label }}</h3>
+          <div class="text-sm text-ink leading-relaxed whitespace-pre-wrap border-l-2 border-cream-dark pl-3">{{ content }}</div>
         </div>
         {% endif %}
       {% endmacro %}
 
-      {{ section_block("Résumé", book.ai_summary) }}
-      {{ section_block("Concepts clés", book.ai_concepts) }}
-      {{ section_block("Citations", book.ai_quotes) }}
-      {{ section_block("Liens avec les thèmes", book.ai_links_to_themes) }}
-      {{ section_block("Idées d'usage", book.ai_usage_ideas) }}
+      {{ fiche_block("Résumé", book.ai_summary) }}
+      {{ fiche_block("Concepts clés", book.ai_concepts) }}
+      {{ fiche_block("Citations", book.ai_quotes) }}
+      {{ fiche_block("Liens avec les thèmes", book.ai_links_to_themes) }}
+      {{ fiche_block("Idées d'usage", book.ai_usage_ideas) }}
 
     {% else %}
-      <div class="text-center py-10 text-stone-400">
-        <p class="text-3xl mb-3">✦</p>
-        <p class="text-sm">Ajoutez vos notes puis cliquez sur<br>« Générer la fiche ».</p>
+      <div class="text-center py-12 text-ink-muted">
+        <p class="font-serif text-4xl mb-4 opacity-20">§</p>
+        <p class="text-sm">Ajoutez vos notes et cliquez<br>sur « Générer la fiche ».</p>
       </div>
     {% endif %}
   </section>

@@ -2,10 +2,13 @@
 {% block title %}Problématiques — Bibliothécaire philo{% endblock %}
 
 {% block content %}
-<div class="flex items-center justify-between mb-6">
-  <h1 class="text-2xl font-bold text-stone-900">Problématiques et plans</h1>
+<div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
+  <div>
+    <h1 class="font-serif text-3xl text-ink font-semibold leading-tight">Problématiques</h1>
+    <p class="text-ink-muted text-sm mt-1">Construire des argumentaires à partir de thèmes et d'auteurs</p>
+  </div>
   <a href="/problems/new"
-     class="inline-flex items-center gap-2 bg-amber-600 hover:bg-amber-700 text-white text-sm font-medium px-4 py-2 rounded-lg shadow transition-colors">
+     class="inline-flex items-center gap-2 bg-bordeaux hover:bg-bordeaux-dark text-ivory text-sm font-medium px-4 py-2.5 rounded-lg shadow-sm self-start sm:self-auto">
     + Nouveau
   </a>
 </div>
@@ -14,23 +17,26 @@
 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
   {% for ps in problem_sets %}
   <a href="/problems/{{ ps.id }}"
-     class="block bg-white rounded-xl shadow-sm border border-stone-200 p-5 hover:shadow-md hover:border-amber-300 transition-all">
-    <div class="flex items-start justify-between gap-2">
-      <h2 class="font-semibold text-stone-900">{{ ps.title }}</h2>
-      <span class="shrink-0 text-xs px-2 py-0.5 rounded-full
-        {% if ps.orientation == 'thread' %}bg-sky-100 text-sky-700{% else %}bg-violet-100 text-violet-700{% endif %}">
+     class="block bg-white rounded-xl border border-cream-dark p-5 hover:shadow-md hover:border-bordeaux/30 transition-all group">
+    <div class="flex items-start justify-between gap-2 mb-1">
+      <h2 class="font-serif text-base font-semibold text-ink group-hover:text-bordeaux transition-colors leading-snug">
+        {{ ps.title }}
+      </h2>
+      <span class="shrink-0 text-xs px-2.5 py-0.5 rounded-full border
+        {% if ps.orientation == 'thread' %}bg-blue-50 text-blue-700 border-blue-200
+        {% else %}bg-cream text-ink-muted border-cream-dark{% endif %}">
         {{ ps.orientation_label }}
       </span>
     </div>
-    <p class="text-xs text-stone-500 mt-1 mb-3">Thème : {{ ps.theme }}</p>
+    <p class="text-xs text-ink-muted mb-3">{{ ps.theme }}</p>
     {% if ps.authors_list %}
-    <div class="flex flex-wrap gap-1">
+    <div class="flex flex-wrap gap-1 mb-3">
       {% for author in ps.authors_list %}
-      <span class="text-xs bg-stone-100 text-stone-600 px-2 py-0.5 rounded-full">{{ author }}</span>
+      <span class="text-xs bg-cream text-ink-muted px-2 py-0.5 rounded-full border border-cream-dark">{{ author }}</span>
       {% endfor %}
     </div>
     {% endif %}
-    <p class="text-xs text-stone-400 mt-3">
+    <p class="text-xs text-ink-muted/60 border-t border-cream-dark pt-3 mt-1">
       {{ ps.problems_list | length }} problématique{% if ps.problems_list | length != 1 %}s{% endif %}
     </p>
   </a>
@@ -38,12 +44,12 @@
 </div>
 
 {% else %}
-<div class="text-center py-20 text-stone-400">
-  <p class="text-5xl mb-4">🧠</p>
-  <p class="text-lg font-medium mb-2">Aucun ensemble de problématiques.</p>
-  <p class="text-sm mb-6">Croisez auteurs et thème pour générer des problématiques et plans.</p>
+<div class="text-center py-24 text-ink-muted">
+  <p class="font-serif text-5xl mb-5 opacity-20">∴</p>
+  <p class="font-serif text-xl text-ink mb-2">Aucune problématique</p>
+  <p class="text-sm mb-8">Croisez auteurs et thème pour générer des plans d'essai.</p>
   <a href="/problems/new"
-     class="bg-amber-600 hover:bg-amber-700 text-white px-5 py-2.5 rounded-lg text-sm font-medium transition-colors">
+     class="bg-bordeaux hover:bg-bordeaux-dark text-ivory px-6 py-3 rounded-lg text-sm font-medium">
     + Nouveau
   </a>
 </div>

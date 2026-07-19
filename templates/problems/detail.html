@@ -4,50 +4,48 @@
 {% block content %}
 
 <!-- En-tête -->
-<div class="flex items-start justify-between mb-6 gap-4">
+<div class="flex items-start justify-between gap-4 mb-7">
   <div>
-    <a href="/problems" class="text-stone-400 hover:text-stone-600 text-sm">← Problématiques</a>
-    <h1 class="text-2xl font-bold text-stone-900 mt-1">{{ ps.title }}</h1>
-    <p class="text-stone-500 text-sm mt-0.5">Thème : <strong>{{ ps.theme }}</strong></p>
-    <div class="flex flex-wrap items-center gap-2 mt-2">
-      <span class="text-xs px-2 py-0.5 rounded-full
-        {% if ps.orientation == 'thread' %}bg-sky-100 text-sky-700{% else %}bg-violet-100 text-violet-700{% endif %}">
+    <a href="/problems" class="text-xs text-ink-muted hover:text-bordeaux inline-flex items-center gap-1 mb-3">← Problématiques</a>
+    <h1 class="font-serif text-3xl text-ink font-semibold leading-tight">{{ ps.title }}</h1>
+    <p class="text-ink-muted text-sm mt-1">Thème : <strong class="text-ink font-medium">{{ ps.theme }}</strong></p>
+    <div class="flex flex-wrap items-center gap-2 mt-3">
+      <span class="text-xs px-2.5 py-0.5 rounded-full border
+        {% if ps.orientation == 'thread' %}bg-blue-50 text-blue-700 border-blue-200
+        {% else %}bg-cream text-ink-muted border-cream-dark{% endif %}">
         {{ ps.orientation_label }}
       </span>
       {% for author in ps.authors_list %}
-      <span class="text-xs bg-stone-100 text-stone-600 px-2 py-0.5 rounded-full">{{ author }}</span>
+      <span class="text-xs bg-cream text-ink-muted px-2.5 py-0.5 rounded-full border border-cream-dark">{{ author }}</span>
       {% endfor %}
     </div>
   </div>
 
   <div class="flex gap-2 shrink-0">
-    <!-- Export Markdown -->
     <a href="/problems/{{ ps.id }}/export"
-       class="text-xs text-stone-600 hover:text-stone-800 border border-stone-300 hover:border-stone-500 px-3 py-1.5 rounded-lg transition-colors">
+       class="text-xs font-medium text-ink-muted hover:text-ink border border-cream-dark hover:border-ink-muted px-3 py-1.5 rounded-lg">
       ↓ Markdown
     </a>
-    <!-- Suppression -->
     <form action="/problems/{{ ps.id }}/delete" method="post"
           onsubmit="return confirm('Supprimer cet ensemble ?')">
       <button type="submit"
-              class="text-xs text-red-400 hover:text-red-600 border border-red-200 hover:border-red-400 px-3 py-1.5 rounded-lg transition-colors">
+              class="text-xs font-medium text-red-400 hover:text-red-600 border border-red-200 hover:border-red-300 px-3 py-1.5 rounded-lg">
         Supprimer
       </button>
     </form>
   </div>
 </div>
 
+<div class="border-t border-cream-dark mb-7"></div>
+
 <!-- Problématiques et plans -->
 {% for plan_item in ps.plans_list %}
-{% set pb_num = loop.index %}
-<article class="bg-white rounded-xl shadow-sm border border-stone-200 p-6 mb-6">
+<article class="bg-white rounded-xl border border-cream-dark shadow-sm p-6 mb-5">
 
   <!-- Problématique -->
-  <div class="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-5">
-    <span class="text-xs font-semibold uppercase tracking-wider text-amber-600">
-      Problématique {{ pb_num }}
-    </span>
-    <p class="text-stone-800 font-medium mt-1 leading-snug">{{ plan_item.problem }}</p>
+  <div class="bg-cream border border-cream-dark rounded-lg px-4 py-3 mb-6">
+    <span class="text-xs font-semibold uppercase tracking-widest text-bordeaux">Problématique {{ loop.index }}</span>
+    <p class="text-ink font-medium mt-1.5 leading-snug">{{ plan_item.problem }}</p>
   </div>
 
   <!-- Plan I / II / III -->
@@ -55,16 +53,17 @@
   <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
     {% for part_key in ['I', 'II', 'III'] %}
     {% set part = plan.get(part_key, {}) %}
-    <div class="border border-stone-100 rounded-lg p-4 bg-stone-50">
-      <div class="flex items-center gap-2 mb-2">
-        <span class="text-xs font-bold text-white bg-stone-700 px-2 py-0.5 rounded">{{ part_key }}</span>
-        <span class="text-sm font-semibold text-stone-800">{{ part.title }}</span>
+    <div class="border border-cream-dark rounded-lg p-4 bg-ivory">
+      <div class="flex items-center gap-2 mb-3">
+        <span class="text-xs font-bold text-ivory bg-ink px-2 py-0.5 rounded font-mono">{{ part_key }}</span>
+        <span class="text-sm font-semibold text-ink leading-snug">{{ part.title }}</span>
       </div>
       {% if part.points %}
-      <ul class="space-y-1 mt-2">
+      <ul class="space-y-1.5">
         {% for point in part.points %}
-        <li class="text-xs text-stone-600 flex items-start gap-1.5">
-          <span class="mt-1 shrink-0 text-amber-400">›</span>{{ point }}
+        <li class="text-xs text-ink-muted flex items-start gap-2">
+          <span class="shrink-0 text-bordeaux mt-0.5">›</span>
+          <span class="leading-relaxed">{{ point }}</span>
         </li>
         {% endfor %}
       </ul>
@@ -72,10 +71,9 @@
     </div>
     {% endfor %}
   </div>
-
 </article>
 {% else %}
-<p class="text-stone-400 text-sm">Aucun plan généré.</p>
+<p class="text-ink-muted text-sm">Aucun plan généré.</p>
 {% endfor %}
 
 {% endblock %}

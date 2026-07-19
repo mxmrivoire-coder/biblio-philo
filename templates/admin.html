@@ -1,61 +1,63 @@
 {% extends "base.html" %}
-{% block title %}Administration — Bibliothécaire philo{% endblock %}
+{% block title %}Sauvegarde — Bibliothécaire philo{% endblock %}
 
 {% block content %}
 <div class="max-w-xl mx-auto">
-  <h1 class="text-2xl font-bold text-stone-900 mb-6">Administration</h1>
+  <h1 class="font-serif text-3xl text-ink font-semibold mb-2">Sauvegarde</h1>
+  <p class="text-ink-muted text-sm mb-8">Exportez et restaurez vos données.</p>
 
   {% if error %}
-  <div class="bg-red-50 border border-red-300 text-red-800 rounded-lg p-4 mb-5 text-sm">{{ error }}</div>
+  <div class="bg-red-50 border border-red-200 text-red-800 rounded-lg p-4 mb-5 text-sm">{{ error }}</div>
   {% endif %}
 
   {% set flash = request.query_params.get('flash') %}
   {% if flash and flash.startswith('import_ok') %}
-  <div class="bg-emerald-50 border border-emerald-300 text-emerald-800 rounded-lg p-4 mb-5 text-sm">
-    Import réussi — {{ flash }}
+  <div class="bg-cream border border-cream-dark text-ink rounded-lg p-4 mb-5 text-sm flex items-center gap-2">
+    <span class="text-bordeaux">✓</span> Import réussi.
   </div>
   {% endif %}
 
   <!-- Stats -->
-  <div class="grid grid-cols-3 gap-4 mb-8">
-    <div class="bg-white rounded-xl border border-stone-200 p-4 text-center">
-      <p class="text-3xl font-bold text-amber-600">{{ nb_books }}</p>
-      <p class="text-xs text-stone-500 mt-1">Livre{% if nb_books > 1 %}s{% endif %}</p>
+  <div class="grid grid-cols-3 gap-3 mb-8">
+    <div class="bg-white rounded-xl border border-cream-dark px-4 py-4 text-center">
+      <p class="font-serif text-2xl font-semibold text-ink">{{ nb_books }}</p>
+      <p class="text-xs text-ink-muted mt-1">Livre{% if nb_books > 1 %}s{% endif %}</p>
     </div>
-    <div class="bg-white rounded-xl border border-stone-200 p-4 text-center">
-      <p class="text-3xl font-bold text-amber-600">{{ nb_maps }}</p>
-      <p class="text-xs text-stone-500 mt-1">Carte{% if nb_maps > 1 %}s{% endif %}</p>
+    <div class="bg-white rounded-xl border border-cream-dark px-4 py-4 text-center">
+      <p class="font-serif text-2xl font-semibold text-ink">{{ nb_maps }}</p>
+      <p class="text-xs text-ink-muted mt-1">Carte{% if nb_maps > 1 %}s{% endif %}</p>
     </div>
-    <div class="bg-white rounded-xl border border-stone-200 p-4 text-center">
-      <p class="text-3xl font-bold text-amber-600">{{ nb_problems }}</p>
-      <p class="text-xs text-stone-500 mt-1">Problématique{% if nb_problems > 1 %}s{% endif %}</p>
+    <div class="bg-white rounded-xl border border-cream-dark px-4 py-4 text-center">
+      <p class="font-serif text-2xl font-semibold text-ink">{{ nb_problems }}</p>
+      <p class="text-xs text-ink-muted mt-1">Problématique{% if nb_problems > 1 %}s{% endif %}</p>
     </div>
   </div>
 
   <!-- Export -->
-  <section class="bg-white rounded-xl border border-stone-200 p-6 mb-5">
-    <h2 class="text-base font-semibold text-stone-800 mb-1">Exporter la bibliothèque</h2>
-    <p class="text-sm text-stone-500 mb-4">
-      Télécharge un fichier JSON contenant tous tes livres, cartes et problématiques.
-      À faire <strong>avant chaque mise à jour</strong> si tu n'as pas de volume Railway configuré.
+  <section class="bg-white rounded-xl border border-cream-dark p-6 mb-4 shadow-sm">
+    <h2 class="font-serif text-lg text-ink font-semibold mb-1">Exporter</h2>
+    <p class="text-sm text-ink-muted mb-5">
+      Télécharge un fichier JSON contenant tous tes livres, cartes et problématiques.<br>
+      À faire avant chaque mise à jour si tu n'as pas de volume Railway configuré.
     </p>
     <a href="/admin/export"
-       class="inline-flex items-center gap-2 bg-amber-600 hover:bg-amber-700 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors">
+       class="inline-flex items-center gap-2 bg-bordeaux hover:bg-bordeaux-dark text-ivory px-4 py-2.5 rounded-lg text-sm font-medium shadow-sm">
       ↓ Télécharger la sauvegarde JSON
     </a>
   </section>
 
   <!-- Import -->
-  <section class="bg-white rounded-xl border border-stone-200 p-6">
-    <h2 class="text-base font-semibold text-stone-800 mb-1">Restaurer depuis une sauvegarde</h2>
-    <p class="text-sm text-stone-500 mb-4">
-      Importe un fichier JSON précédemment exporté. Les entrées déjà présentes en base ne sont pas écrasées.
+  <section class="bg-white rounded-xl border border-cream-dark p-6 shadow-sm">
+    <h2 class="font-serif text-lg text-ink font-semibold mb-1">Restaurer</h2>
+    <p class="text-sm text-ink-muted mb-5">
+      Importe un fichier JSON précédemment exporté.<br>
+      Les entrées déjà présentes en base ne sont pas écrasées.
     </p>
-    <form action="/admin/import" method="post" enctype="multipart/form-data" class="flex items-center gap-3">
+    <form action="/admin/import" method="post" enctype="multipart/form-data" class="flex flex-col sm:flex-row items-start gap-3">
       <input type="file" name="file" accept=".json" required
-             class="text-sm text-stone-600 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border file:border-stone-300 file:text-sm file:font-medium file:bg-stone-50 hover:file:bg-stone-100">
+             class="text-sm text-ink-muted file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border file:border-cream-dark file:text-xs file:font-medium file:bg-cream file:text-ink-muted hover:file:bg-ivory cursor-pointer">
       <button type="submit"
-              class="bg-stone-700 hover:bg-stone-800 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+              class="bg-ink hover:bg-ink-light text-ivory px-4 py-2 rounded-lg text-sm font-medium">
         Restaurer
       </button>
     </form>

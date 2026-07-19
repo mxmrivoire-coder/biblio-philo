@@ -3,42 +3,44 @@
 
 {% block content %}
 <div class="max-w-xl mx-auto">
-  <div class="flex items-center gap-3 mb-6">
-    <a href="/books" class="text-stone-400 hover:text-stone-600 text-sm">← Retour</a>
-    <h1 class="text-2xl font-bold text-stone-900">Ajouter un livre</h1>
-  </div>
+  <a href="/books" class="text-xs text-ink-muted hover:text-bordeaux inline-flex items-center gap-1 mb-5">← Bibliothèque</a>
+  <h1 class="font-serif text-3xl text-ink font-semibold mb-7">Ajouter un livre</h1>
 
-  <form action="/books" method="post" class="bg-white rounded-xl shadow-sm border border-stone-200 p-6 space-y-5">
+  <form action="/books" method="post"
+        class="bg-white rounded-xl border border-cream-dark shadow-sm p-6 space-y-5">
 
     <div>
-      <label for="title" class="block text-sm font-medium text-stone-700 mb-1">Titre <span class="text-red-500">*</span></label>
-      <input type="text" id="title" name="title" required
-             class="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-             placeholder="Ex. : La Condition humaine">
+      <label for="title" class="block text-xs font-semibold uppercase tracking-widest text-ink-muted mb-2">
+        Titre <span class="text-bordeaux normal-case tracking-normal font-normal">*</span>
+      </label>
+      <input type="text" id="title" name="title" required autocomplete="off"
+             class="w-full border border-cream-dark bg-ivory rounded-lg px-4 py-2.5 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-bordeaux/30 focus:border-bordeaux"
+             placeholder="ex. : La Condition humaine">
     </div>
 
     <div>
-      <label for="author" class="block text-sm font-medium text-stone-700 mb-1">Auteur <span class="text-red-500">*</span></label>
-      <input type="text" id="author" name="author" required
-             class="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-             placeholder="Ex. : Hannah Arendt">
+      <label for="author" class="block text-xs font-semibold uppercase tracking-widest text-ink-muted mb-2">
+        Auteur <span class="text-bordeaux normal-case tracking-normal font-normal">*</span>
+      </label>
+      <input type="text" id="author" name="author" required autocomplete="off"
+             class="w-full border border-cream-dark bg-ivory rounded-lg px-4 py-2.5 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-bordeaux/30 focus:border-bordeaux"
+             placeholder="ex. : Hannah Arendt">
     </div>
 
     <div class="grid grid-cols-2 gap-4">
       <div>
-        <label for="type" class="block text-sm font-medium text-stone-700 mb-1">Type</label>
+        <label for="type" class="block text-xs font-semibold uppercase tracking-widest text-ink-muted mb-2">Type</label>
         <select id="type" name="type"
-                class="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
+                class="w-full border border-cream-dark bg-ivory rounded-lg px-3 py-2.5 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-bordeaux/30">
           {% for value, label in book_types %}
           <option value="{{ value }}">{{ label }}</option>
           {% endfor %}
         </select>
       </div>
-
       <div>
-        <label for="status" class="block text-sm font-medium text-stone-700 mb-1">Statut</label>
+        <label for="status" class="block text-xs font-semibold uppercase tracking-widest text-ink-muted mb-2">Statut</label>
         <select id="status" name="status"
-                class="w-full border border-stone-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
+                class="w-full border border-cream-dark bg-ivory rounded-lg px-3 py-2.5 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-bordeaux/30">
           {% for value, label in book_statuses %}
           <option value="{{ value }}">{{ label }}</option>
           {% endfor %}
@@ -48,19 +50,15 @@
 
     <div class="pt-2 flex gap-3">
       <button type="submit"
-              class="bg-amber-600 hover:bg-amber-700 text-white px-5 py-2.5 rounded-lg text-sm font-medium transition-colors">
+              class="bg-bordeaux hover:bg-bordeaux-dark text-ivory px-5 py-2.5 rounded-lg text-sm font-medium shadow-sm">
         Enregistrer
       </button>
       <a href="/books"
-         class="px-5 py-2.5 rounded-lg text-sm font-medium border border-stone-300 hover:bg-stone-100 transition-colors">
+         class="px-5 py-2.5 rounded-lg text-sm font-medium border border-cream-dark hover:bg-cream text-ink-muted hover:text-ink">
         Annuler
       </a>
     </div>
-
   </form>
-
-  <p class="text-xs text-stone-400 mt-4">
-    Vous pourrez ajouter vos notes de lecture et générer la fiche IA depuis la page du livre.
-  </p>
+  <p class="text-xs text-ink-muted mt-4">Les notes et la fiche IA seront ajoutées depuis la page du livre.</p>
 </div>
 {% endblock %}
