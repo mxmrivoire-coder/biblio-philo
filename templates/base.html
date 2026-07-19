@@ -8,7 +8,7 @@
   <!-- Google Fonts : Playfair Display (titres) + Inter (interface) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 
   <!-- TailwindCSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -21,11 +21,12 @@
       theme: {
         extend: {
           colors: {
-            ivory:   { DEFAULT: '#faf8f4', dark: '#f2ece0' },
-            ink:     { DEFAULT: '#2c2416', light: '#4a3f2f', muted: '#7a6a55' },
-            cream:   { DEFAULT: '#f5f0e8', dark: '#e8dfc8' },
-            bordeaux:{ DEFAULT: '#7c3d2e', light: '#9b4e3b', dark: '#5e2d20' },
-            sage:    { DEFAULT: '#4a6741', light: '#e8efe7' },
+            ivory:    { DEFAULT: '#faf8f4', dark: '#f0e9d8' },
+            ink:      { DEFAULT: '#2c2416', light: '#4a3f2f', muted: '#8a7560' },
+            cream:    { DEFAULT: '#f5f0e8', dark: '#e4d9c4' },
+            bordeaux: { DEFAULT: '#7c3d2e', light: '#9b4e3b', dark: '#5e2d20' },
+            sage:     { DEFAULT: '#3d5e36', light: '#eaf0e8' },
+            parchment:{ DEFAULT: '#f8f4ec' },
           },
           fontFamily: {
             serif: ['Playfair Display', 'Georgia', 'serif'],
@@ -37,98 +38,163 @@
   </script>
 
   <style>
-    body { background-color: #faf8f4; color: #2c2416; font-family: 'Inter', sans-serif; }
-    h1, h2.serif { font-family: 'Playfair Display', Georgia, serif; }
+    body {
+      background-color: #faf8f4;
+      color: #2c2416;
+      font-family: 'Inter', sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
 
     /* Scrollbar discrète */
     ::-webkit-scrollbar { width: 5px; }
     ::-webkit-scrollbar-thumb { background: #c8b89a; border-radius: 3px; }
 
-    /* Underline nav actif */
-    .nav-active { border-bottom: 2px solid #c8a882; padding-bottom: 2px; }
-
     /* Transition douce globale */
     a, button { transition: all 0.15s ease; }
 
-    /* Badges type */
-    .badge-roman    { background: #e8edf5; color: #3a5278; }
-    .badge-philo    { background: #f0ebf5; color: #5c3d7a; }
-    .badge-politique{ background: #f5ebe8; color: #7c3d2e; }
-    .badge-socio    { background: #e8f0eb; color: #3a6647; }
-    .badge-encours  { background: #fef3e2; color: #92580a; }
-    .badge-termine  { background: #e8f0eb; color: #2d6a4f; }
+    /* Nav active */
+    .nav-active { color: #faf8f4 !important; border-bottom: 1.5px solid #c8a882; padding-bottom: 3px; }
+
+    /* ── Badges TYPE ─────────────────────────────────────────── */
+    .badge-roman     { background: #eaecf2; color: #354870; border: 1px solid #d0d5e6; }
+    .badge-philo     { background: #eeebf4; color: #523671; border: 1px solid #ddd5ec; }
+    .badge-politique { background: #f4edea; color: #6b3022; border: 1px solid #e8d0c8; }
+    .badge-socio     { background: #e8f0e6; color: #2e5228; border: 1px solid #cfe0cc; }
+
+    /* ── Badges STATUT ───────────────────────────────────────── */
+    .badge-encours {
+      background: #fdf5e4;
+      color: #7a5200;
+      border: 1px solid #e8d59a;
+      font-weight: 500;
+    }
+    .badge-termine {
+      background: #eaf3e8;
+      color: #2e5228;
+      border: 1px solid #bdd9b8;
+      font-weight: 500;
+    }
+
+    /* ── Ligne livre dans la table ───────────────────────────── */
+    .book-row td { padding-top: 14px; padding-bottom: 14px; }
+    .book-row:last-child td { border-bottom: none; }
+
+    /* Titre du livre : ancrage éditorial */
+    .book-title {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 0.9375rem;   /* 15px */
+      line-height: 1.35;
+      color: #2c2416;
+      font-weight: 400;
+    }
+    .book-title:hover { color: #7c3d2e; }
+
+    /* Auteur secondaire */
+    .book-author {
+      font-size: 0.75rem;
+      color: #8a7560;
+      font-style: italic;
+      margin-top: 2px;
+    }
+
+    /* Headers de colonne allégés */
+    .col-header {
+      font-size: 0.6875rem;   /* 11px */
+      font-weight: 500;
+      color: #a09282;
+      letter-spacing: 0.05em;
+      text-transform: none;   /* pas de capslock agressif */
+    }
+
+    /* Indicateur fiche IA */
+    .fiche-present { color: #3d5e36; font-size: 0.8rem; }
+    .fiche-absent  { color: #d5c9b8; font-size: 0.8rem; }
+
+    /* Lien action chevron */
+    .action-link {
+      font-size: 0.75rem;
+      color: #8a7560;
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+    }
+    .action-link:hover { color: #7c3d2e; }
+
+    /* Séparateur section */
+    .section-divider {
+      border: none;
+      border-top: 1px solid #e4d9c4;
+      margin: 1.5rem 0;
+    }
   </style>
 </head>
 
 <body class="min-h-screen flex flex-col">
 
   <!-- ══════════════════════════════════════════════════════════
-       HEADER ÉDITORIAL
+       HEADER
   ══════════════════════════════════════════════════════════ -->
   <header class="bg-ink border-b border-ink-light">
-    <!-- Barre de navigation -->
-    <div class="max-w-6xl mx-auto px-5 py-3 flex items-center justify-between">
+    <div class="max-w-6xl mx-auto px-5 py-3.5 flex items-center justify-between">
+
       <a href="/" class="flex items-center gap-2.5 group">
-        <span class="text-cream text-xl leading-none">⌖</span>
-        <div>
-          <span class="font-serif text-cream text-base font-semibold tracking-wide group-hover:text-bordeaux-light transition-colors">
-            Bibliothécaire
-          </span>
-          <span class="font-serif text-ink-muted text-base font-light tracking-wide ml-1">philo</span>
-        </div>
+        <span class="text-cream/40 text-sm leading-none font-serif select-none">⌖</span>
+        <span class="font-serif text-cream text-sm font-semibold tracking-wide group-hover:text-bordeaux-light">
+          Bibliothécaire
+        </span>
+        <span class="font-serif text-ink-muted text-sm font-light tracking-wide">philo</span>
       </a>
 
-      <!-- Navigation desktop -->
+      <!-- Nav desktop -->
       <nav class="hidden sm:flex items-center gap-7">
         {% set path = request.url.path %}
         <a href="/books"
-           class="text-sm font-medium text-cream/70 hover:text-cream transition-colors {% if path.startswith('/books') %}text-cream nav-active{% endif %}">
+           class="text-xs font-medium text-cream/60 hover:text-cream tracking-wide {% if path.startswith('/books') %}nav-active{% endif %}">
           Livres
         </a>
         <a href="/concept-maps"
-           class="text-sm font-medium text-cream/70 hover:text-cream transition-colors {% if path.startswith('/concept-maps') %}text-cream nav-active{% endif %}">
+           class="text-xs font-medium text-cream/60 hover:text-cream tracking-wide {% if path.startswith('/concept-maps') %}nav-active{% endif %}">
           Cartes
         </a>
         <a href="/problems"
-           class="text-sm font-medium text-cream/70 hover:text-cream transition-colors {% if path.startswith('/problems') %}text-cream nav-active{% endif %}">
+           class="text-xs font-medium text-cream/60 hover:text-cream tracking-wide {% if path.startswith('/problems') %}nav-active{% endif %}">
           Problématiques
         </a>
         <a href="/admin"
-           class="text-sm font-medium text-cream/70 hover:text-cream transition-colors {% if path.startswith('/admin') %}text-cream nav-active{% endif %}">
+           class="text-xs font-medium text-cream/60 hover:text-cream tracking-wide {% if path.startswith('/admin') %}nav-active{% endif %}">
           Sauvegarde
         </a>
       </nav>
 
       <!-- Burger mobile -->
-      <button id="burger" class="sm:hidden text-cream/70 hover:text-cream p-1" aria-label="Menu">
-        <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M3 6h16M3 12h16M3 18h16"/>
+      <button id="burger" class="sm:hidden text-cream/60 hover:text-cream p-1" aria-label="Menu">
+        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M3 5h14M3 10h14M3 15h14"/>
         </svg>
       </button>
     </div>
 
-    <!-- Menu mobile déroulant -->
-    <div id="mobile-menu" class="sm:hidden hidden border-t border-ink-light bg-ink-light px-5 pb-4 pt-3 flex flex-col gap-3">
+    <!-- Menu mobile -->
+    <div id="mobile-menu" class="sm:hidden hidden border-t border-ink-light bg-ink px-5 pb-5 pt-4 flex flex-col gap-4">
       {% set path = request.url.path %}
-      <a href="/books"       class="text-sm text-cream/80 hover:text-cream {% if path.startswith('/books') %}text-cream font-medium{% endif %}">Livres</a>
-      <a href="/concept-maps" class="text-sm text-cream/80 hover:text-cream {% if path.startswith('/concept-maps') %}text-cream font-medium{% endif %}">Cartes conceptuelles</a>
-      <a href="/problems"    class="text-sm text-cream/80 hover:text-cream {% if path.startswith('/problems') %}text-cream font-medium{% endif %}">Problématiques</a>
-      <a href="/admin"       class="text-sm text-cream/80 hover:text-cream {% if path.startswith('/admin') %}text-cream font-medium{% endif %}">Sauvegarde</a>
+      <a href="/books"        class="text-sm text-cream/70 hover:text-cream {% if path.startswith('/books') %}text-cream font-medium{% endif %}">Livres</a>
+      <a href="/concept-maps" class="text-sm text-cream/70 hover:text-cream {% if path.startswith('/concept-maps') %}text-cream font-medium{% endif %}">Cartes conceptuelles</a>
+      <a href="/problems"     class="text-sm text-cream/70 hover:text-cream {% if path.startswith('/problems') %}text-cream font-medium{% endif %}">Problématiques</a>
+      <a href="/admin"        class="text-sm text-cream/70 hover:text-cream {% if path.startswith('/admin') %}text-cream font-medium{% endif %}">Sauvegarde</a>
     </div>
   </header>
 
   <!-- ══════════════════════════════════════════════════════════
-       FLASH MESSAGE
+       FLASH
   ══════════════════════════════════════════════════════════ -->
   {% set flash = request.query_params.get('flash') %}
   {% if flash %}
-  <div id="flash-msg" role="alert"
-       class="max-w-6xl mx-auto w-full px-5 mt-4">
-    <div class="bg-cream border border-cream-dark text-ink rounded-lg px-4 py-3 text-sm flex justify-between items-center shadow-sm">
+  <div id="flash-msg" role="alert" class="max-w-6xl mx-auto w-full px-5 mt-5">
+    <div class="bg-parchment border border-cream-dark text-ink-muted rounded-lg px-4 py-3 text-sm flex justify-between items-center">
       <span class="flex items-center gap-2">
-        <span class="text-bordeaux">✓</span>
+        <span class="text-sage text-xs">✓</span>
         {% if flash == 'notes_saved' %}Notes enregistrées.
-        {% elif flash == 'fiche_generated' %}Fiche de lecture générée avec succès.
+        {% elif flash == 'fiche_generated' %}Fiche de lecture générée.
         {% elif flash == 'book_updated' %}Livre mis à jour.
         {% elif flash == 'book_deleted' %}Livre supprimé.
         {% elif flash == 'map_deleted' %}Carte supprimée.
@@ -136,30 +202,33 @@
         {% else %}Opération effectuée.{% endif %}
       </span>
       <button onclick="document.getElementById('flash-msg').remove()"
-              class="text-ink-muted hover:text-ink ml-4 text-lg leading-none font-light">×</button>
+              class="text-ink-muted/50 hover:text-ink ml-4 text-base leading-none">×</button>
     </div>
   </div>
   {% endif %}
 
   <!-- ══════════════════════════════════════════════════════════
-       CONTENU PRINCIPAL
+       CONTENU
   ══════════════════════════════════════════════════════════ -->
-  <main class="flex-1 max-w-6xl mx-auto w-full px-5 py-8">
+  <main class="flex-1 max-w-6xl mx-auto w-full px-5 py-9">
     {% block content %}{% endblock %}
   </main>
 
   <!-- ══════════════════════════════════════════════════════════
-       FOOTER
+       FOOTER — signature éditoriale
   ══════════════════════════════════════════════════════════ -->
   <footer class="border-t border-cream-dark mt-auto">
-    <div class="max-w-6xl mx-auto px-5 py-4 flex items-center justify-between">
-      <span class="font-serif text-ink-muted text-xs italic">Bibliothécaire philo/politique — usage personnel</span>
-      <span class="text-xs text-ink-muted/50">⌖</span>
+    <div class="max-w-6xl mx-auto px-5 py-5 flex items-center justify-between">
+      <div>
+        <span class="font-serif text-ink-muted/70 text-xs italic">Cabinet de lecture personnel</span>
+        <span class="text-ink-muted/30 mx-2 text-xs">·</span>
+        <span class="font-serif text-ink-muted/40 text-xs italic">philosophie, politique, littérature</span>
+      </div>
+      <span class="text-ink-muted/25 text-xs font-serif select-none">⌖</span>
     </div>
   </footer>
 
   <script>
-    // Burger mobile
     document.getElementById('burger')?.addEventListener('click', () => {
       document.getElementById('mobile-menu').classList.toggle('hidden');
     });
