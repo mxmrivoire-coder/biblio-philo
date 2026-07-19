@@ -4,7 +4,7 @@
 {% block content %}
 
 <!-- ══════════════════════════════════════════════════════
-     EN-TÊTE DE PAGE
+     EN-TÊTE DE PAGE  (inchangé)
 ══════════════════════════════════════════════════════ -->
 <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-7">
   <div>
@@ -17,14 +17,14 @@
   </div>
   <a href="/books/new"
      class="inline-flex items-center gap-1.5 bg-bordeaux hover:bg-bordeaux-dark text-ivory text-xs font-medium px-4 py-2.5 rounded-lg shadow-sm self-start tracking-wide shrink-0 mt-0.5">
-    <span class="text-xs opacity-70">+</span> Ajouter un livre
+    <span class="opacity-60">+</span>&ensp;Ajouter un livre
   </a>
 </div>
 
 {% if books %}
 
 <!-- ══════════════════════════════════════════════════════
-     STATS — 4 indicateurs
+     STATS  (inchangées)
 ══════════════════════════════════════════════════════ -->
 {% set nb_total   = books|length %}
 {% set nb_encours = books|selectattr('status','eq','en_cours')|list|length %}
@@ -33,35 +33,37 @@
 
 <div class="grid grid-cols-4 gap-px bg-cream-dark rounded-xl overflow-hidden border border-cream-dark mb-7">
   {% for label, value, accent in [
-    ('Livres',   nb_total,   false),
-    ('En cours', nb_encours, false),
-    ('Terminés', nb_termine, false),
-    ('Fiches IA',nb_ai,      true)
+    ('Livres',    nb_total,   false),
+    ('En cours',  nb_encours, false),
+    ('Terminés',  nb_termine, false),
+    ('Fiches IA', nb_ai,      true)
   ] %}
   <div class="bg-parchment px-4 py-3.5 text-center">
-    <p class="font-serif text-xl font-semibold {% if accent %}text-bordeaux{% else %}text-ink{% endif %} leading-none">
-      {{ value }}
-    </p>
-    <p class="text-ink-muted/70 text-xs mt-1.5 tracking-wide">{{ label }}</p>
+    <p class="font-serif text-xl font-semibold {{ 'text-bordeaux' if accent else 'text-ink' }} leading-none">{{ value }}</p>
+    <p class="text-ink-muted/60 text-xs mt-1.5 tracking-wide">{{ label }}</p>
   </div>
   {% endfor %}
 </div>
 
 <!-- ══════════════════════════════════════════════════════
-     RECHERCHE + FILTRES
+     RECHERCHE + FILTRES  (inchangés)
 ══════════════════════════════════════════════════════ -->
 <div class="flex flex-col sm:flex-row gap-2.5 mb-6">
   <div class="relative flex-1">
-    <svg class="absolute left-3 top-1/2 -translate-y-1/2 text-ink-muted/40 w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+    <svg class="absolute left-3 top-1/2 -translate-y-1/2 text-ink-muted/35 w-3.5 h-3.5"
+         fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
     </svg>
     <input type="text" id="search-input"
            placeholder="Rechercher un titre, un auteur…"
-           class="w-full border border-cream-dark bg-white rounded-lg pl-9 pr-4 py-2.5 text-sm text-ink placeholder-ink-muted/40 focus:outline-none focus:ring-1 focus:ring-bordeaux/40 focus:border-bordeaux/60">
+           class="w-full border border-cream-dark bg-white rounded-lg pl-9 pr-4 py-2.5 text-sm text-ink placeholder-ink-muted/35
+                  focus:outline-none focus:ring-1 focus:ring-bordeaux/40 focus:border-bordeaux/60">
   </div>
 
   <select id="filter-type"
-          class="border border-cream-dark bg-white rounded-lg px-3 py-2.5 text-sm text-ink-muted focus:outline-none focus:ring-1 focus:ring-bordeaux/40 focus:border-bordeaux/60 sm:w-44">
+          class="border border-cream-dark bg-white rounded-lg px-3 py-2.5 text-sm text-ink-muted
+                 focus:outline-none focus:ring-1 focus:ring-bordeaux/40 sm:w-44">
     <option value="">Tous les types</option>
     <option value="roman">Roman</option>
     <option value="essai_philo">Essai philo</option>
@@ -70,7 +72,8 @@
   </select>
 
   <select id="filter-status"
-          class="border border-cream-dark bg-white rounded-lg px-3 py-2.5 text-sm text-ink-muted focus:outline-none focus:ring-1 focus:ring-bordeaux/40 focus:border-bordeaux/60 sm:w-36">
+          class="border border-cream-dark bg-white rounded-lg px-3 py-2.5 text-sm text-ink-muted
+                 focus:outline-none focus:ring-1 focus:ring-bordeaux/40 sm:w-36">
     <option value="">Tous les statuts</option>
     <option value="en_cours">En cours</option>
     <option value="terminé">Terminés</option>
@@ -78,75 +81,143 @@
 </div>
 
 <!-- ══════════════════════════════════════════════════════
-     TABLE DES LIVRES
+     LISTE DES LIVRES
+     Colonnes :  [Œuvre — flex]  [Type 108px]  [Statut 102px]  [Fiche 80px]  [→ 28px]
 ══════════════════════════════════════════════════════ -->
-<div class="rounded-xl border border-cream-dark overflow-hidden bg-white shadow-sm">
+<div class="rounded-xl overflow-hidden border border-cream-dark bg-white" style="box-shadow: 0 1px 4px rgba(44,36,22,.06);">
 
-  <!-- Headers -->
-  <div class="grid border-b border-cream-dark bg-parchment px-5 py-2.5"
-       style="grid-template-columns: 1fr 100px 90px 32px 28px;">
-    <span class="col-header">Œuvre</span>
-    <span class="col-header hidden md:block">Type</span>
-    <span class="col-header">Statut</span>
-    <span class="col-header text-center hidden sm:block" title="Fiche de lecture générée par IA">Fiche</span>
+  <!-- ── En-tête des colonnes ──────────────────────────────── -->
+  <div class="grid items-center border-b border-cream-dark bg-parchment px-6 py-2"
+       style="grid-template-columns: 1fr 108px 102px 80px 28px;">
+    <span style="font-size:10.5px;font-weight:500;color:#a8967e;letter-spacing:.06em;">Œuvre</span>
+    <span style="font-size:10.5px;font-weight:500;color:#a8967e;letter-spacing:.06em;" class="hidden md:block">Type</span>
+    <span style="font-size:10.5px;font-weight:500;color:#a8967e;letter-spacing:.06em;">Statut</span>
+    <span style="font-size:10.5px;font-weight:500;color:#a8967e;letter-spacing:.06em;" class="hidden sm:block text-center">Fiche</span>
     <span></span>
   </div>
 
-  <!-- Lignes -->
+  <!-- ── Lignes ────────────────────────────────────────────── -->
   <div id="books-tbody">
     {% for book in books %}
-    <div class="book-row grid border-b border-cream-dark/50 px-5 hover:bg-ivory cursor-pointer"
-         style="grid-template-columns: 1fr 100px 90px 32px 28px;"
+
+    {# Séparateur allégé : ligne fine uniquement, sans fond alterné #}
+    <div class="book-row grid items-center px-6 hover:bg-ivory transition-colors duration-100 cursor-pointer
+                {% if not loop.last %}border-b border-cream-dark/40{% endif %}"
+         style="grid-template-columns: 1fr 108px 102px 80px 28px; min-height: 64px;"
          data-title="{{ book.title|lower }}"
          data-author="{{ book.author|lower }}"
          data-type="{{ book.type }}"
          data-status="{{ book.status }}"
          onclick="window.location='/books/{{ book.id }}'">
 
-      <!-- Titre + auteur empilés -->
-      <div class="flex flex-col justify-center py-3.5 min-w-0">
+      <!-- ① ŒUVRE : titre en serif + auteur secondaire ──── -->
+      <div class="flex flex-col justify-center py-4 min-w-0 pr-4">
+
+        {# Titre — ancrage éditorial, Playfair 15.5px #}
         <a href="/books/{{ book.id }}"
-           class="book-title truncate pr-3"
-           onclick="event.stopPropagation()">
+           onclick="event.stopPropagation()"
+           style="font-family:'Playfair Display',Georgia,serif;
+                  font-size:15.5px;
+                  font-weight:400;
+                  line-height:1.3;
+                  color:#2c2416;
+                  white-space:nowrap;
+                  overflow:hidden;
+                  text-overflow:ellipsis;
+                  display:block;"
+           onmouseover="this.style.color='#7c3d2e'"
+           onmouseout="this.style.color='#2c2416'">
           {{ book.title }}
         </a>
-        <span class="book-author">{{ book.author }}</span>
-        <!-- Sur mobile : badge statut sous l'auteur -->
-        <div class="mt-1.5 md:hidden">
-          <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs badge-{{ 'termine' if book.status == 'terminé' else 'encours' }}">
-            {{ book.status_label }}
+
+        {# Auteur — secondaire, italique, taille réduite #}
+        <span style="font-size:12px;color:#9a856b;font-style:italic;margin-top:3px;
+                     white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+          {{ book.author }}
+        </span>
+
+        {# Mobile : statut inline sous l'auteur #}
+        <div class="mt-2 md:hidden">
+          {% if book.status == 'terminé' %}
+          <span style="font-size:10.5px;font-weight:500;color:#2e5228;
+                       background:#eaf3e8;border:1px solid #bdd9b8;
+                       padding:2px 8px;border-radius:4px;display:inline-block;">
+            Terminé
           </span>
+          {% else %}
+          <span style="font-size:10.5px;font-weight:500;color:#7a5200;
+                       background:#fdf5e4;border:1px solid #e8d59a;
+                       padding:2px 8px;border-radius:4px;display:inline-block;">
+            En cours
+          </span>
+          {% endif %}
         </div>
       </div>
 
-      <!-- Type — masqué sous md -->
+      <!-- ② TYPE (masqué sous md) ──────────────────────────── -->
       <div class="hidden md:flex items-center">
-        <span class="inline-block px-2 py-0.5 rounded text-xs badge-{{ book.type.replace('essai_', '') if 'essai_' in book.type else book.type }}">
+        <span class="inline-block px-2 py-0.5 rounded text-xs
+          badge-{{ book.type.replace('essai_','') if 'essai_' in book.type else book.type }}">
           {{ book.type_label }}
         </span>
       </div>
 
-      <!-- Statut — masqué sous md -->
+      <!-- ③ STATUT (masqué sous md) ───────────────────────── -->
       <div class="hidden md:flex items-center">
-        <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs badge-{{ 'termine' if book.status == 'terminé' else 'encours' }}">
-          <span class="w-1.5 h-1.5 rounded-full {{ 'bg-sage' if book.status == 'terminé' else 'bg-amber-500/80' }}"></span>
-          {{ book.status_label }}
+        {% if book.status == 'terminé' %}
+        <span style="display:inline-flex;align-items:center;gap:5px;
+                     font-size:11px;font-weight:500;color:#2e5228;
+                     background:#eaf3e8;border:1px solid #bdd9b8;
+                     padding:3px 9px;border-radius:5px;">
+          <span style="width:5px;height:5px;border-radius:50%;background:#3d5e36;flex-shrink:0;"></span>
+          Terminé
         </span>
-      </div>
-
-      <!-- Fiche IA -->
-      <div class="hidden sm:flex items-center justify-center">
-        {% if book.has_ai_content %}
-          <span class="fiche-present" title="Fiche de lecture disponible">✦</span>
         {% else %}
-          <span class="fiche-absent" title="Pas encore de fiche">○</span>
+        <span style="display:inline-flex;align-items:center;gap:5px;
+                     font-size:11px;font-weight:500;color:#7a5200;
+                     background:#fdf5e4;border:1px solid #e8d59a;
+                     padding:3px 9px;border-radius:5px;">
+          <span style="width:5px;height:5px;border-radius:50%;background:#d97706;flex-shrink:0;"></span>
+          En cours
+        </span>
         {% endif %}
       </div>
 
-      <!-- Chevron -->
+      <!-- ④ FICHE IA ─────────────────────────────────────── -->
+      <div class="hidden sm:flex items-center justify-center">
+        {% if book.has_ai_content %}
+        <span style="display:inline-flex;align-items:center;gap:4px;
+                     font-size:10.5px;font-weight:500;color:#3d5e36;
+                     background:#eaf3e8;border:1px solid #bdd9b8;
+                     padding:2px 7px;border-radius:4px;"
+              title="Fiche de lecture disponible">
+          <svg width="9" height="9" viewBox="0 0 10 10" fill="#3d5e36" style="flex-shrink:0;">
+            <path d="M5 1l1.2 2.4L9 3.8 6.9 5.8l.5 2.8L5 7.3 2.6 8.6l.5-2.8L1 3.8l2.8-.4z"/>
+          </svg>
+          Disponible
+        </span>
+        {% else %}
+        <span style="display:inline-flex;align-items:center;gap:4px;
+                     font-size:10.5px;color:#b8a48e;
+                     padding:2px 7px;"
+              title="Pas encore de fiche générée">
+          <span style="width:5px;height:5px;border-radius:50%;border:1px solid #c8b89a;display:inline-block;flex-shrink:0;"></span>
+          Aucune
+        </span>
+        {% endif %}
+      </div>
+
+      <!-- ⑤ CHEVRON ──────────────────────────────────────── -->
       <div class="flex items-center justify-center">
-        <a href="/books/{{ book.id }}" onclick="event.stopPropagation()" class="action-link" aria-label="Ouvrir">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <a href="/books/{{ book.id }}"
+           onclick="event.stopPropagation()"
+           aria-label="Ouvrir {{ book.title }}"
+           style="color:#c8b89a;display:flex;align-items:center;"
+           onmouseover="this.style.color='#7c3d2e'"
+           onmouseout="this.style.color='#c8b89a'">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="1.8"
+               stroke-linecap="round" stroke-linejoin="round">
             <path d="M9 18l6-6-6-6"/>
           </svg>
         </a>
@@ -156,9 +227,9 @@
     {% endfor %}
   </div>
 
-  <!-- Pied de tableau : compteur -->
-  <div class="px-5 py-3 border-t border-cream-dark/40 bg-parchment">
-    <p class="text-xs text-ink-muted/60 italic" id="results-count">
+  <!-- ── Pied de liste : compteur ──────────────────────────── -->
+  <div class="px-6 py-3 border-t border-cream-dark/40 bg-parchment">
+    <p style="font-size:11px;color:#b8a48e;font-style:italic;" id="results-count">
       {{ books|length }} titre{% if books|length > 1 %}s{% endif %}
     </p>
   </div>
@@ -166,7 +237,7 @@
 </div>
 
 <!-- ══════════════════════════════════════════════════════
-     JS : recherche + filtres
+     JS : recherche + filtres  (inchangé)
 ══════════════════════════════════════════════════════ -->
 <script>
   const searchInput  = document.getElementById('search-input');
@@ -193,8 +264,8 @@
     counter.textContent = visible + ' titre' + (visible > 1 ? 's' : '');
   }
 
-  searchInput.addEventListener('input',  applyFilters);
-  filterType.addEventListener('change',  applyFilters);
+  searchInput.addEventListener('input',   applyFilters);
+  filterType.addEventListener('change',   applyFilters);
   filterStatus.addEventListener('change', applyFilters);
 </script>
 
@@ -202,7 +273,7 @@
 
 <!-- ── Bibliothèque vide ──────────────────────────────── -->
 <div class="text-center py-28 text-ink-muted">
-  <p class="font-serif text-4xl mb-5 text-ink-muted/20 select-none">§</p>
+  <p class="font-serif text-4xl mb-5 select-none" style="color:#d5c9b4;">§</p>
   <p class="font-serif text-xl text-ink mb-2">Bibliothèque vide</p>
   <p class="text-sm font-light mb-8">Commencez par ajouter votre premier livre.</p>
   <a href="/books/new"
